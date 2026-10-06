@@ -1,24 +1,369 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monte seu Time - Forçamon</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(rgba(11, 14, 20, 0.88), rgba(11, 14, 20, 0.95)),
+                  url('bg-pokemon.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 30px 16px;
+    }
+
+    header {
+      max-width: 900px;
+      margin: 0 auto 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-voltar {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .btn-voltar:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+    }
+
+    .main-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .team-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .team-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .slots-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .slot {
+      width: 120px;
+      height: 150px;
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slot.drag-over {
+      border-color: #38bdf8;
+      background: #f1f5f9;
+      transform: scale(1.03);
+    }
+
+    .slot img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .slot.filled img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      margin-bottom: 0;
+    }
+
+    .slot span {
+      font-size: 0.8rem;
+      color: #334155;
+      font-weight: 700;
+    }
+
+    .cards-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .cards-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #94a3b8;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+    }
+
+    .card-item {
+      aspect-ratio: 3/4;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: grab;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-item:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .card-item:active {
+      cursor: grabbing;
+    }
+
+    .card-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .btn-salvar {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 12px 28px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-salvar:hover {
+      background: #7dd3fc;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
-    <h1>Forçamons</h1>
 
-    <fieldset>
-        FORÇAMONS AQUI
-    </fieldset>
+  <header>
+    <h1>Monte seu Time</h1>
+    <button class="btn-voltar" onclick="voltar()">← Voltar</button>
+  </header>
 
-    <button onclick="Voltar()">Inicio</button>
+  <div class="main-container">
 
+    <section class="team-section">
+      <h2>Sua Equipe (Arraste os cards para os slots ou clique neles)</h2>
+      
+      <div class="slots-grid">
+        <div class="slot" data-slot="1" ondragover="permitirSoltar(event)" ondragleave="sairDrag(event)" ondrop="soltarCard(event)" onclick="removerDoSlot(this)">
+          <img src="pokebola2.png" alt="Pokébola">
+          <span>Slot 1</span>
+        </div>
+        <div class="slot" data-slot="2" ondragover="permitirSoltar(event)" ondragleave="sairDrag(event)" ondrop="soltarCard(event)" onclick="removerDoSlot(this)">
+          <img src="pokebola2.png" alt="Pokébola">
+          <span>Slot 2</span>
+        </div>
+        <div class="slot" data-slot="3" ondragover="permitirSoltar(event)" ondragleave="sairDrag(event)" ondrop="soltarCard(event)" onclick="removerDoSlot(this)">
+          <img src="pokebola2.png" alt="Pokébola">
+          <span>Slot 3</span>
+        </div>
+      </div>
+    </section>
 
-    <script>
-        function Voltar(){
-            window.location.href = "site_jogo.php";
+    <section class="cards-section">
+      <h2>Forçamons Disponíveis</h2>
+
+      <div class="cards-grid">
+        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_1.jpg">
+          <img src="personagens/time_forcamon_1.jpg" alt="Criatura 1">
+        </div>
+
+        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_2.jpg">
+          <img src="personagens/time_forcamon_2.jpg" alt="Criatura 2">
+        </div>
+
+        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_3.jpg">
+          <img src="personagens/time_forcamon_3.jpg" alt="Criatura 3">
+        </div>
+
+        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_4.jpg">
+          <img src="personagens/time_forcamon_4.jpg" alt="Criatura 4">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-salvar" onclick="salvarTime()">Confirmar Time</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Redireciona de volta para a tela inicial do jogo
+    function voltar() {
+      window.location.href = "site_jogo.php";
+    }
+
+    let itemArrastadoSrc = "";
+
+    // Guarda o caminho da imagem do card que o jogador começou a arrastar
+    function iniciarArraste(e) {
+      const imgSrc = e.currentTarget.getAttribute('data-img');
+      itemArrastadoSrc = imgSrc;
+      e.dataTransfer.setData("text/plain", imgSrc);
+    }
+
+    // Libera o slot pra poder receber o card
+    function permitirSoltar(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    // Tira a borda azul quando o mouse sai de cima do slot
+    function sairDrag(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    // Trata o momento em que o card é solto dentro de um slot
+    function soltarCard(e) {
+      e.preventDefault();
+      const slot = e.currentTarget;
+      slot.classList.remove('drag-over');
+      
+      if (itemArrastadoSrc) {
+        if (jaEstaNoTime(itemArrastadoSrc)) {
+          alert("Esse Forçamon já está no seu time!");
+          return;
         }
-    </script>
+        preencherSlot(slot, itemArrastadoSrc);
+      }
+    }
+
+    // Se clicar no card, joga ele no primeiro slot vago disponível
+    function adicionarAoSlot(cardElement) {
+      const imgSrc = cardElement.getAttribute('data-img');
+      
+      if (jaEstaNoTime(imgSrc)) {
+        alert("Esse Forçamon já está no seu time!");
+        return;
+      }
+
+      const slots = document.querySelectorAll('.slot');
+      for (let slot of slots) {
+        if (!slot.classList.contains('filled')) {
+          preencherSlot(slot, imgSrc);
+          break;
+        }
+      }
+    }
+
+    // Checa se a imagem selecionada já não tá ocupando algum dos 3 slots
+    function jaEstaNoTime(imgSrc) {
+      const slotsOcupados = document.querySelectorAll('.slot.filled');
+      for (let slot of slotsOcupados) {
+        if (slot.getAttribute('data-selected-img') === imgSrc) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Coloca a imagem do Forçamon dentro do slot e marca que ele tá ocupado
+    function preencherSlot(slot, imgSrc) {
+      slot.classList.add('filled');
+      slot.setAttribute('data-selected-img', imgSrc);
+      slot.innerHTML = `<img src="${imgSrc}" alt="Forçamon Selecionado">`;
+    }
+
+    // Limpa o slot e volta a Pokébola original se a pessoa clicar no slot preenchido
+    function removerDoSlot(slot) {
+      if (slot.classList.contains('filled')) {
+        const numeroSlot = slot.getAttribute('data-slot');
+        slot.classList.remove('filled');
+        slot.removeAttribute('data-selected-img');
+        slot.innerHTML = `
+          <img src="pokebola2.png" alt="Pokébola">
+          <span>Slot ${numeroSlot}</span>
+        `;
+      }
+    }
+
+    // Garante que a pessoa só confirma se tiver exatamente 3 Forçamons no time
+    function salvarTime() {
+      const slotsPreenchidos = document.querySelectorAll('.slot.filled').length;
+
+      if (slotsPreenchidos < 3) {
+        alert("Você precisa selecionar 3 Forçamons para confirmar o seu time!");
+        return;
+      }
+
+      alert("Time gravado com sucesso!");
+    }
+  </script>
+
 </body>
 </html>
