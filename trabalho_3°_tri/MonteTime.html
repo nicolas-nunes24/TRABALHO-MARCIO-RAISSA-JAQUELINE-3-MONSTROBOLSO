@@ -160,8 +160,10 @@
       cursor: grab;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      padding-top: 8px;
     }
 
     .card-item:hover {
@@ -174,11 +176,24 @@
       cursor: grabbing;
     }
 
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
     .card-item img {
       width: 100%;
-      height: 100%;
+      height: calc(100% - 24px);
       object-fit: cover;
       pointer-events: none;
+    }
+
+    .card-item.hidden {
+      display: none !important;
     }
 
     .actions {
@@ -238,20 +253,49 @@
       <h2>Forçamons Disponíveis</h2>
 
       <div class="cards-grid">
-        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_1.jpg">
-          <img src="personagens/time_forcamon_1.jpg" alt="Criatura 1">
+        <div class="card-item" id="card-rubizard" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/rubizard.png" data-name="Rubizard">
+          <span class="card-title">Rubizard</span>
+          <img src="imagens-personagens/rubizard.png" alt="Rubizard">
         </div>
 
-        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_2.jpg">
-          <img src="personagens/time_forcamon_2.jpg" alt="Criatura 2">
+        <div class="card-item" id="card-nilldrill" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/nilldrill.png" data-name="Nilldrill">
+          <span class="card-title">Nilldrill</span>
+          <img src="imagens-personagens/nilldrill.png" alt="Nilldrill">
         </div>
 
-        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_3.jpg">
-          <img src="personagens/time_forcamon_3.jpg" alt="Criatura 3">
+        <div class="card-item" id="card-vianalax" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/vianalax.png" data-name="Vianalax">
+          <span class="card-title">Vianalax</span>
+          <img src="imagens-personagens/vianalax.png" alt="Vianalax">
         </div>
 
-        <div class="card-item" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="personagens/time_forcamon_4.jpg">
-          <img src="personagens/time_forcamon_4.jpg" alt="Criatura 4">
+        <div class="card-item" id="card-violetwo" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/violetwo.png" data-name="Violetwo">
+          <span class="card-title">Violetwo</span>
+          <img src="imagens-personagens/violetwo.png" alt="Violetwo">
+        </div>
+
+        <div class="card-item" id="card-darkvi" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/darkvi.png" data-name="Darkvi">
+          <span class="card-title">Darkvi</span>
+          <img src="imagens-personagens/darkvi.png" alt="Darkvi">
+        </div>
+
+        <div class="card-item" id="card-brrpatana" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/brrpatana.png" data-name="Brrpatana">
+          <span class="card-title">Brrpatana</span>
+          <img src="imagens-personagens/brrpatana.png" alt="Brrpatana">
+        </div>
+
+        <div class="card-item" id="card-meloetta" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/meloetta.png" data-name="Meloetta">
+          <span class="card-title">Meloetta</span>
+          <img src="imagens-personagens/meloetta.png" alt="Meloetta">
+        </div>
+
+        <div class="card-item" id="card-dragofav" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/dragofav.png" data-name="Dragofav">
+          <span class="card-title">Dragofav</span>
+          <img src="imagens-personagens/dragofav.png" alt="Dragofav">
+        </div>
+
+        <div class="card-item" id="card-velostervroom" draggable="true" ondragstart="iniciarArraste(event)" onclick="adicionarAoSlot(this)" data-img="imagens-personagens/velostervroom.png" data-name="Velostervroom">
+          <span class="card-title">Velostervroom</span>
+          <img src="imagens-personagens/velostervroom.png" alt="Velostervroom">
         </div>
       </div>
 
@@ -263,87 +307,81 @@
   </div>
 
   <script>
-    // Redireciona de volta para a tela inicial do jogo
     function voltar() {
       window.location.href = "site_jogo.php";
     }
 
-    let itemArrastadoSrc = "";
+    let cardArrastadoId = "";
 
-    // Guarda o caminho da imagem do card que o jogador começou a arrastar
     function iniciarArraste(e) {
-      const imgSrc = e.currentTarget.getAttribute('data-img');
-      itemArrastadoSrc = imgSrc;
-      e.dataTransfer.setData("text/plain", imgSrc);
+      cardArrastadoId = e.currentTarget.id;
+      e.dataTransfer.setData("text/plain", cardArrastadoId);
     }
 
-    // Libera o slot pra poder receber o card
     function permitirSoltar(e) {
       e.preventDefault();
       e.currentTarget.classList.add('drag-over');
     }
 
-    // Tira a borda azul quando o mouse sai de cima do slot
     function sairDrag(e) {
       e.currentTarget.classList.remove('drag-over');
     }
 
-    // Trata o momento em que o card é solto dentro de um slot
     function soltarCard(e) {
       e.preventDefault();
       const slot = e.currentTarget;
       slot.classList.remove('drag-over');
       
-      if (itemArrastadoSrc) {
-        if (jaEstaNoTime(itemArrastadoSrc)) {
-          alert("Esse Forçamon já está no seu time!");
-          return;
+      if (cardArrastadoId) {
+        if (slot.classList.contains('filled')) {
+          removerDoSlot(slot);
         }
-        preencherSlot(slot, itemArrastadoSrc);
+        preencherSlot(slot, cardArrastadoId);
+        cardArrastadoId = "";
       }
     }
 
-    // Se clicar no card, joga ele no primeiro slot vago disponível
     function adicionarAoSlot(cardElement) {
-      const imgSrc = cardElement.getAttribute('data-img');
-      
-      if (jaEstaNoTime(imgSrc)) {
-        alert("Esse Forçamon já está no seu time!");
-        return;
-      }
-
+      const cardId = cardElement.id;
       const slots = document.querySelectorAll('.slot');
+
       for (let slot of slots) {
         if (!slot.classList.contains('filled')) {
-          preencherSlot(slot, imgSrc);
+          preencherSlot(slot, cardId);
           break;
         }
       }
     }
 
-    // Checa se a imagem selecionada já não tá ocupando algum dos 3 slots
-    function jaEstaNoTime(imgSrc) {
-      const slotsOcupados = document.querySelectorAll('.slot.filled');
-      for (let slot of slotsOcupados) {
-        if (slot.getAttribute('data-selected-img') === imgSrc) {
-          return true;
-        }
-      }
-      return false;
-    }
+    function preencherSlot(slot, cardId) {
+      const cardElement = document.getElementById(cardId);
+      if (!cardElement) return;
 
-    // Coloca a imagem do Forçamon dentro do slot e marca que ele tá ocupado
-    function preencherSlot(slot, imgSrc) {
+      const imgSrc = cardElement.getAttribute('data-img');
+      const nome = cardElement.getAttribute('data-name');
+
       slot.classList.add('filled');
+      slot.setAttribute('data-card-id', cardId);
       slot.setAttribute('data-selected-img', imgSrc);
-      slot.innerHTML = `<img src="${imgSrc}" alt="Forçamon Selecionado">`;
+      
+      slot.innerHTML = `<img src="${imgSrc}" alt="${nome}">`;
+      cardElement.classList.add('hidden');
     }
 
-    // Limpa o slot e volta a Pokébola original se a pessoa clicar no slot preenchido
     function removerDoSlot(slot) {
       if (slot.classList.contains('filled')) {
         const numeroSlot = slot.getAttribute('data-slot');
+        const cardId = slot.getAttribute('data-card-id');
+        
+        if (cardId) {
+          const cardElement = document.getElementById(cardId);
+          if (cardElement) {
+            cardElement.classList.remove('hidden');
+          }
+        }
+
         slot.classList.remove('filled');
+        slot.removeAttribute('data-card-id');
         slot.removeAttribute('data-selected-img');
         slot.innerHTML = `
           <img src="pokebola2.png" alt="Pokébola">
@@ -352,7 +390,6 @@
       }
     }
 
-    // Garante que a pessoa só confirma se tiver exatamente 3 Forçamons no time
     function salvarTime() {
       const slotsPreenchidos = document.querySelectorAll('.slot.filled').length;
 
