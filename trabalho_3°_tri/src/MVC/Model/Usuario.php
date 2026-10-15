@@ -121,6 +121,16 @@ class Usuario{
         return $stmt->execute([':id' => $this->id_usuario]);
     }
     
+    public function validaNome($nome){
+        if(strlen($nome) < 3 || strlen($nome) > 20){
+            throw new Exception("Nome de usuario deve ter entre 3 e 20 caracteres");
+        }
+    }
+
+    public function validaEmail($email){
+        if()
+    }
+    
     }
 
     
