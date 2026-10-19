@@ -19,15 +19,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Montar Time - MonstroBolso</title>
   <style>
-    /* Estilo básico pra não ficar feio */
+    /* Estilo básico */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-    body { background-color: #121417; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+    
+    body { 
+      background-color: #121417; 
+      /* Fundo escurecido com a imagem bg-pokemon.jpg */
+      background-image: linear-gradient(rgba(18, 20, 23, 0.88), rgba(18, 20, 23, 0.88)), url('bg-pokemon.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #fff; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      padding: 20px; 
+      min-height: 100vh; 
+    }
     
     header { width: 100%; max-width: 680px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; }
     h1 { font-size: 1.4rem; text-transform: uppercase; }
     .voltar { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
 
-    .caixa { width: 100%; max-width: 680px; background-color: #1e293b; border: 2px solid #334155; border-radius: 6px; padding: 16px; text-align: center; margin-bottom: 20px; }
+    .caixa { 
+      width: 100%; 
+      max-width: 680px; 
+      background-color: rgba(30, 41, 59, 0.95); 
+      border: 2px solid #334155; 
+      border-radius: 6px; 
+      padding: 16px; 
+      text-align: center; 
+      margin-bottom: 20px; 
+      backdrop-filter: blur(4px);
+    }
     .caixa h2 { font-size: 0.95rem; margin-bottom: 12px; color: #94a3b8; text-transform: uppercase; }
 
     .slots { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
