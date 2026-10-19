@@ -5,7 +5,15 @@ require_once "../models/Usuario.php";
 
 class UsuarioController {
 
-
+    /**
+     * Auxiliar para respostas JSON com cabeçalho correto
+     */
+    private function jsonResponse(array $dados, int $statusCode = 200) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($dados, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 
     /**
      * Cadastra um novo usuário
@@ -20,7 +28,6 @@ class UsuarioController {
         $senha = $_POST['senha'] ?? null;
 
         try {
-            // O próprio construtor executa as validações e o hash da senha
             $usuario = new Usuario($nome, $email, $senha);
 
             if ($usuario->cadastrar()) {
@@ -34,7 +41,6 @@ class UsuarioController {
             return $this->jsonResponse(['sucesso' => false, 'mensagem' => 'Erro ao salvar no banco de dados'], 500);
 
         } catch (Exception $e) {
-            // Captura as validações de nome/e-mail lançadas pelo Model
             return $this->jsonResponse(['sucesso' => false, 'mensagem' => $e->getMessage()], 400);
         }
     }
@@ -77,19 +83,16 @@ class UsuarioController {
         }
 
         try {
-            // Ler dados enviados na requisição
             $dados = $_POST;
             if (empty($dados)) {
                 parse_str(file_get_contents("php://input"), $dados);
             }
 
             if (!empty($dados['nome'])) {
-                $usuario->validaNome($dados['nome']);
                 $usuario->setNome($dados['nome']);
             }
 
             if (!empty($dados['email'])) {
-                // Como validaEmail é privado no Model, a validação é feita ao atualizar via setter/método
                 $usuario->setEmail($dados['email']);
             }
 
@@ -101,7 +104,7 @@ class UsuarioController {
                 $usuario->setMoedas((int)$dados['moedas']);
             }
 
-            if ($usuario->cadastrar()) { // Método cadastrar() também faz UPDATE se houver ID
+            if ($usuario->cadastrar()) {
                 return $this->jsonResponse(['sucesso' => true, 'mensagem' => 'Usuário atualizado com sucesso']);
             }
 
@@ -132,4 +135,3 @@ class UsuarioController {
         return $this->jsonResponse(['sucesso' => false, 'mensagem' => 'Erro ao excluir usuário'], 500);
     }
 }
-?>

@@ -9,22 +9,16 @@ class Usuario {
     private $email;
     private $senha;
     private $moedas;
-    private $db;
 
     public function __construct(string $nome = null, string $email = null, string $senha = null) {
-        if (!isset($nome) && !isset($email) && !isset($senha)) return;
+        if ($nome === null && $email === null && $senha === null) return;
         
-        self::validaNome($nome);
-        self::validaEmail($email);
-        $senha = password_hash($senha, PASSWORD_DEFAULT);
-
-        $this->nome = $nome;
-        $this->email = strtolower(trim($email));
-        $this->senha = $senha;
+        $this->setNome($nome);
+        $this->setEmail($email);
+        $this->setSenha($senha);
         $this->moedas = 0;
     }
 
-   
     private static function getByColumn($valor, $coluna) {
         $db = conexao();
 
@@ -40,10 +34,6 @@ class Usuario {
     }
 
     // Getters
-    public function getDb() {
-        return $this->db;
-    }    
-
     public function getId() {
         return $this->id;
     }
@@ -64,21 +54,26 @@ class Usuario {
         return $this->moedas;
     }
 
-    // Setters
+    // Setters com validações embutidas
     public function setNome($nome) {
-        $this->nome = $nome;
+        $this->validaNome($nome);
+        $this->nome = trim($nome);
     }
 
     public function setEmail($email) {
-        $this->email = $email;
+        $this->validaEmail($email);
+        $this->email = strtolower(trim($email));
     }
 
     public function setSenha($senha) {
+        if (empty($senha) || strlen($senha) < 6) {
+            throw new Exception("A senha deve ter no mínimo 6 caracteres");
+        }
         $this->senha = password_hash($senha, PASSWORD_DEFAULT);
     }
 
     public function setMoedas($moedas) {
-        $this->moedas = $moedas;
+        $this->moedas = (int) $moedas;
     }
 
     public function cadastrar() {
@@ -119,13 +114,13 @@ class Usuario {
             $this->id     = $dados['id_usuario'];
             $this->nome   = $dados['nome']; 
             $this->email  = $dados['email'];
+            $this->senha  = $dados['senha']; // Carregado para não perder a senha ao fazer UPDATE
             $this->moedas = $dados['moedas'];
             return true;
         }
         return false;
     }
 
-   
     public function delete() {
         if (!$this->id) return false;
         $db = conexao();
@@ -145,12 +140,13 @@ class Usuario {
         }
 
         $finalNome = self::getByColumn($nome, 'nome');
-        if (!empty($finalNome)) {
+        // Ignora a validação se o nome pertencer ao próprio usuário que está sendo alterado
+        if (!empty($finalNome) && $finalNome['id_usuario'] != $this->id) {
             throw new Exception('Este nome já está cadastrado');
         }
     }
 
-    private static function validaEmail($email) {
+    public function validaEmail($email) {
         $email = trim($email);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -162,11 +158,9 @@ class Usuario {
         }
 
         $finalEmail = self::getByColumn($email, 'email');
-        if (!empty($finalEmail)) {
+        // Ignora a validação se o e-mail pertencer ao próprio usuário que está sendo alterado
+        if (!empty($finalEmail) && $finalEmail['id_usuario'] != $this->id) {
             throw new Exception('Este email já está cadastrado');
         }
     }
 }
-?>
-
-```
