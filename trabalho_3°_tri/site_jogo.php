@@ -33,7 +33,7 @@ function jogar(){
 }
 
 function TrocaTela(){
-    window.location.href = "MonteTime.html";
+    window.location.href = "monte_time.php";
 }
 
 // Função para abrir a Forçadex
