@@ -29,9 +29,9 @@ class UsuarioController {
         }
 
         try {
+            // Passa os 3 parâmetros aceitos pelo construtor da Model (nome, email, senha)
             $usuario = new Usuario(
                 $_POST['nome'] ?? '',
-                $_POST['username'] ?? '',
                 $_POST['email'] ?? '',
                 $_POST['senha'] ?? ''
             );
@@ -50,16 +50,15 @@ class UsuarioController {
             $this->redirecionarComErro('login', 'Você deve preencher todos os campos.');
         }
 
-        $username = trim($_POST['username']);
+        $email = trim($_POST['email']);
         $senha = $_POST['senha'];
 
-        // Busca o objeto Usuario pelo username
-        $user = Usuario::getByColumn($username, 'username');
+        // Busca o usuário por email
+        $user = Usuario::getByColumn($email, 'email');
 
         if ($user && password_verify($senha, $user->getSenha())) {
             $_SESSION['usuario_id'] = $user->getId();
             $_SESSION['usuario_nome'] = $user->getNome();
-            $_SESSION['usuario_username'] = $user->getUsername();
             
             header("Location: ?acao=dashboard");
             exit;

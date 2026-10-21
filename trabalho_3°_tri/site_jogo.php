@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!--<style link="jogo.css"></style>-->
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forçamon</title>
@@ -20,7 +20,7 @@
     <button type="button" onclick="abrirForcadex()">Acessar Forçadex</button>
 
     <h1>Lojinha</h1>
-    <p>ITENS DA LOJA AQUI</p>
+    <button type="button" onclick="telaLojinha()">Loja</button>
 </fieldset>
 
 <div id="time">
@@ -39,6 +39,10 @@ function TrocaTela(){
 // Função para abrir a Forçadex
 function abrirForcadex(){
     window.location.href = "aba-personagens.html";
+}
+
+function telaLojinha(){
+    window.location.href = "lojinha.php";
 }
 </script>
 </body>

@@ -4,30 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-   <? require_once("../../Model/Usuario.php"); 
-      require_once("../../Controller/UsuarioController.php");  
-   ?>
 </head>
 <body>
     
-    <h2>Login</h2>
+    <h2>Cadastro</h2>
 
-    <form action="cadastro.php" method="post">
+    <form action="?acao=registrar" method="post">
 
         <label>Nome: </label>
-        <input type="text" name="nome"  placeholder="Digite seu nome de usuario" required>
+        <input type="text" name="nome"  placeholder="Digite seu nome de usuario:" required>
 
         <label>Senha: </label>
-        <input type="password" name="senha" placeholder="Digite sua senha" required>
+        <input type="password" name="senha" placeholder="Digite sua senha:" required>
 
-        <input type="submit" name="btnSubmit">
+        <label>Email: </label>
+        <input type="email" name="email" placeholder="Digite seu email:" required>
+
+        <input type="submit" name="btnSubmit" value="Cadastrar">
     </form>
-    <br>    <hr>
-
-    <?php
-        $nome = $_POST["nome"];
-
-        echo $nome;        
-    ?>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 
-require_once "../config.php";
+require_once __DIR__ . "/trabalho_3°_tri/config/config.php";
 
 class Usuario {
 
@@ -19,13 +19,7 @@ class Usuario {
         $this->moedas = 0;
     }
 
-
     public static function getByColumn($valor, $coluna) {
-        $db = conexao();
-
-        $colunasPermitidas = ['id_usuario', 'nome', 'username', 'email'];
-
-    private static function getByColumn($valor, $coluna) {
         $db = conexao();
 
         $colunasPermitidas = ['id_usuario', 'nome', 'email'];
@@ -44,14 +38,13 @@ class Usuario {
             return null;
         }
 
-        // Instancia e hidrata o objeto Usuario para retornar ao Controller
+        // Instancia e hidrata o objeto Usuario
         $usuario = new self();
-        $usuario->id       = $dados['id_usuario'];
-        $usuario->nome     = $dados['nome'];
-        $usuario->username = $dados['username'];
-        $usuario->email    = $dados['email'];
-        $usuario->senha    = $dados['senha'];
-        $usuario->moedas   = $dados['moedas'];
+        $usuario->id     = $dados['id_usuario'];
+        $usuario->nome   = $dados['nome'];
+        $usuario->email  = $dados['email'];
+        $usuario->senha  = $dados['senha'];
+        $usuario->moedas = $dados['moedas'];
 
         return $usuario;
     }
@@ -59,7 +52,6 @@ class Usuario {
     // Getters
     public function getId() { return $this->id; }
     public function getNome() { return $this->nome; }
-    public function getUsername() { return $this->username; }
     public function getEmail() { return $this->email; }
     public function getSenha() { return $this->senha; }
     public function getMoedas() { return $this->moedas; }
@@ -68,41 +60,6 @@ class Usuario {
     public function setNome($nome) {
         $this->validaNome($nome);
         $this->nome = trim($nome);
-    }
-
-    public function setUsername($username) {
-        $this->validaUsername($username);
-        $this->username = strtolower(trim($username));
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Getters
-    public function getId() {
-        return $this->id;
-    }
-
-    public function getNome() {
-        return $this->nome;
-    }    
-
-    public function getEmail() {
-        return $this->email;
-    }
-
-    public function getSenha() {
-        return $this->senha;
-    }
-
-    public function getMoedas() {
-        return $this->moedas;
-    }
-
-    // Setters com validações embutidas
-    public function setNome($nome) {
-        $this->validaNome($nome);
-        $this->nome = trim($nome);
-
     }
 
     public function setEmail($email) {
@@ -119,6 +76,10 @@ class Usuario {
 
     public function setMoedas($moedas) {
         $this->moedas = (int) $moedas;
+    }
+
+    public function salvar() {
+        return $this->cadastrar();
     }
 
     public function cadastrar() {
@@ -159,7 +120,7 @@ class Usuario {
             $this->id     = $dados['id_usuario'];
             $this->nome   = $dados['nome']; 
             $this->email  = $dados['email'];
-            $this->senha  = $dados['senha']; // Carregado para não perder a senha ao fazer UPDATE
+            $this->senha  = $dados['senha'];
             $this->moedas = $dados['moedas'];
             return true;
         }
@@ -184,9 +145,8 @@ class Usuario {
             throw new Exception("O nome de usuário não pode conter caracteres especiais ou números");
         }
 
-        $finalNome = self::getByColumn($nome, 'nome');
-        // Ignora a validação se o nome pertencer ao próprio usuário que está sendo alterado
-        if (!empty($finalNome) && $finalNome['id_usuario'] != $this->id) {
+        $usuarioExistente = self::getByColumn($nome, 'nome');
+        if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
             throw new Exception('Este nome já está cadastrado');
         }
     }
@@ -202,11 +162,9 @@ class Usuario {
             throw new Exception("O email digitado excede o limite de 120 caracteres");
         }
 
-        $finalEmail = self::getByColumn($email, 'email');
-        // Ignora a validação se o e-mail pertencer ao próprio usuário que está sendo alterado
-        if (!empty($finalEmail) && $finalEmail['id_usuario'] != $this->id) {
+        $usuarioExistente = self::getByColumn($email, 'email');
+        if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
             throw new Exception('Este email já está cadastrado');
         }
     }
-}
 }
