@@ -1,12 +1,13 @@
 <?php
-    require_once "/trabalho_3°_tri/config/autoload.php";
 
-    $acao = $_GET['acao'] ?? 'cadastro';
-    
-    $nomeClasse = ucfirst(basename(__DIR__));
-    $nomeController = $nomeClasse . "Controller";
+require_once __DIR__ . "/Controller/UsuarioController.php";
 
-    $controller = new $nomeController();
+$acao = $_GET['acao'] ?? 'cadastro';
 
+$controller = new UsuarioController();
+
+if (method_exists($controller, $acao)) {
     $controller->$acao();
-?>
+} else {
+    die("Ação '{$acao}' não encontrada.");
+}

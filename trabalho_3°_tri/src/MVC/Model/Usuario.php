@@ -38,25 +38,24 @@ class Usuario {
             return null;
         }
 
-        // Instancia e hidrata o objeto Usuario
+        
         $usuario = new self();
-        $usuario->id     = $dados['id_usuario'];
+        $usuario->id     = (int) $dados['id_usuario'];
         $usuario->nome   = $dados['nome'];
         $usuario->email  = $dados['email'];
-        $usuario->senha  = $dados['senha'];
-        $usuario->moedas = $dados['moedas'];
+        $usuario->senha  = $dados['senha']; 
+        $usuario->moedas = (int) $dados['moedas'];
 
         return $usuario;
     }
 
-    // Getters
     public function getId() { return $this->id; }
     public function getNome() { return $this->nome; }
     public function getEmail() { return $this->email; }
     public function getSenha() { return $this->senha; }
     public function getMoedas() { return $this->moedas; }
 
-    // Setters com validações
+    
     public function setNome($nome) {
         $this->validaNome($nome);
         $this->nome = trim($nome);
@@ -71,6 +70,7 @@ class Usuario {
         if (empty($senha) || strlen($senha) < 6) {
             throw new Exception("A senha deve ter no mínimo 6 caracteres");
         }
+        
         $this->senha = password_hash($senha, PASSWORD_DEFAULT);
     }
 
@@ -117,11 +117,11 @@ class Usuario {
         $stmt->execute([':id' => $id]);
         
         if ($dados = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->id     = $dados['id_usuario'];
+            $this->id     = (int) $dados['id_usuario'];
             $this->nome   = $dados['nome']; 
             $this->email  = $dados['email'];
             $this->senha  = $dados['senha'];
-            $this->moedas = $dados['moedas'];
+            $this->moedas = (int) $dados['moedas'];
             return true;
         }
         return false;
@@ -141,8 +141,9 @@ class Usuario {
             throw new Exception("Nome de usuário deve ter entre 3 e 20 caracteres");
         }
 
-        if (!preg_match('/^[\p{L}\s-]+$/u', $nome)) {
-            throw new Exception("O nome de usuário não pode conter caracteres especiais ou números");
+        
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/u', $nome)) {
+            throw new Exception("O nome de usuário pode conter apenas letras, números, hífen e underline");
         }
 
         $usuarioExistente = self::getByColumn($nome, 'nome');
