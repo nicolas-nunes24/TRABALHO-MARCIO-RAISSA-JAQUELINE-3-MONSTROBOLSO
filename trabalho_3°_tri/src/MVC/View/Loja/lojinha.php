@@ -20,11 +20,11 @@
     
         function comprarItem(valorItem){
             if(saldoMoeda < valorItem){
-               return alert("<span>Você não tem saldo!</span>");
+               return alert("Você não tem saldo!");
                 
             }
             saldoMoeda -= valorItem;
-            return alert ("<span>Sucesso! Item adicionado a sua mochila!</span>");
+            return alert("Sucesso! Item adicionado a sua mochila!");
         }
     </script>
     

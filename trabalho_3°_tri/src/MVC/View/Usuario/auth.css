@@ -1,0 +1,182 @@
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&display=swap");
+
+:root {
+    /* Imagens (ficam na raiz do projeto, quatro pastas acima deste arquivo) */
+    --fundo: url("../../../../fundo-imagem.jpg");
+    --pokebola: url("../../../../pokebola.svg");
+
+    --cor-fundo-pagina: #0d1117;
+    --cor-card: #1b232d;
+    --cor-campo: #131a22;
+    --cor-borda: #2a3542;
+    --cor-texto: #ffffff;
+    --cor-texto-suave: #8b98a8;
+    --cor-destaque: #2fb3f0;
+    --cor-destaque-escura: #1d8cc0;
+    --cor-erro: #ff6b6b;
+    --cor-sucesso: #4cd98a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px 16px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--cor-texto);
+    background-color: var(--cor-fundo-pagina);
+}
+
+/* Imagem de fundo ocupando a tela, levemente desfocada e escurecida */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--fundo) center / cover no-repeat;
+    filter: blur(4px) brightness(0.7) saturate(1.1);
+    transform: scale(1.03);
+}
+
+/* Logo: letras amarelas coladas, com contorno azul e contorno externo escuro; o segundo "o" é a pokébola */
+.logo {
+    margin: 0 0 12px;
+    font-family: "Lilita One", "Arial Black", "Segoe UI Black", Impact, sans-serif;
+    font-size: clamp(3.6rem, 13vw, 7rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #ffcb05;
+    -webkit-text-stroke: 0.14em #2a5db0;
+    paint-order: stroke fill;
+    filter:
+        drop-shadow(0.025em 0 0 #12285a)
+        drop-shadow(-0.025em 0 0 #12285a)
+        drop-shadow(0 0.025em 0 #12285a)
+        drop-shadow(0 -0.025em 0 #12285a)
+        drop-shadow(0 0.06em 0 #12285a)
+        drop-shadow(0 0.1em 0.12em rgba(0, 0, 0, 0.6));
+}
+
+.logo-o {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin: 0 0.02em;
+    vertical-align: -0.04em;
+    background: var(--pokebola) center / contain no-repeat;
+}
+
+.card {
+    width: 100%;
+    max-width: 380px;
+    padding: 28px 28px 40px;
+    background: var(--cor-card);
+    border-top: 3px solid var(--cor-destaque);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.abas {
+    display: flex;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.aba {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--cor-texto-suave);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s;
+}
+
+.aba:hover {
+    color: var(--cor-texto);
+}
+
+.aba.ativa {
+    color: var(--cor-texto);
+    border-bottom-color: var(--cor-destaque);
+}
+
+.mensagem {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+}
+
+.mensagem.erro {
+    color: var(--cor-erro);
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.mensagem.sucesso {
+    color: var(--cor-sucesso);
+    background: rgba(76, 217, 138, 0.1);
+    border: 1px solid rgba(76, 217, 138, 0.4);
+}
+
+.campo {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 17px 18px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--cor-texto);
+    background: var(--cor-campo);
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo::placeholder {
+    color: var(--cor-texto-suave);
+}
+
+.campo:focus {
+    border-color: var(--cor-destaque);
+}
+
+.botao {
+    width: 100%;
+    margin-top: 12px;
+    padding: 16px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--cor-texto);
+    background: var(--cor-destaque);
+    border: none;
+    border-bottom: 4px solid var(--cor-destaque-escura);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.botao:hover {
+    filter: brightness(1.1);
+}
+
+.botao:active {
+    border-bottom-width: 2px;
+    transform: translateY(2px);
+}

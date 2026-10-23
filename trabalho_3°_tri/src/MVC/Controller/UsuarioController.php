@@ -23,6 +23,23 @@ class UsuarioController {
         $this->renderizar('login');
     }
 
+    public function dashboard() {
+        if (empty($_SESSION['usuario_id'])) {
+            header("Location: ?acao=login");
+            exit;
+        }
+
+        $usuario = Usuario::getByColumn($_SESSION['usuario_id'], 'id_usuario');
+
+        if (!$usuario) {
+            $this->logout();
+        }
+
+        $moeda = $usuario->getMoedas();
+
+        $this->renderizar('../Loja/lojinha', ['moeda' => $moeda]);
+    }
+
     public function registrar() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirecionarComErro('cadastro', 'Requisição inválida.');
@@ -48,7 +65,7 @@ class UsuarioController {
             }
 
         } catch (Exception $e) {
-            // Captura erros de validação da Model (ex: e-mail já cadastrado, senha curta)
+         
             $this->redirecionarComErro('cadastro', $e->getMessage());
         }
     }
@@ -63,7 +80,7 @@ class UsuarioController {
 
         try {
           
-            $user = Usuario::getByLoginOrEmail($loginInput);
+            $user = Usuario::getByColumn(strtolower($loginInput), 'email');
 
             if ($user && password_verify($senha, $user->getSenha())) {
                 session_regenerate_id(true);
@@ -71,7 +88,7 @@ class UsuarioController {
                 $_SESSION['usuario_id'] = $user->getId();
                 $_SESSION['usuario_nome'] = $user->getNome();
                 
-                header("Location: ?acao=dashboard");
+                header("Location: ../../../../site_jogo.php");
                 exit;
             }
 

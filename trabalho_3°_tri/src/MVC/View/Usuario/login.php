@@ -3,41 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Entrar - Forçamon</title>
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
 
-    <h2>Login</h2>
 
-   
-    <?php if (!empty($_SESSION['flash_error'])): ?>
-        <p style="color: red;"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
-        <?php unset($_SESSION['flash_error']); ?>
-    <?php endif; ?>
 
-    <?php if (!empty($_SESSION['flash_success'])): ?>
-        <p style="color: green;"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
-        <?php unset($_SESSION['flash_success']); ?>
-    <?php endif; ?>
+    <h1 class="logo" aria-label="Forçamon">Forçam<span class="logo-o"></span>n</h1>
 
-    
-    <form action="index.php?acao=fazerLogin" method="post">
-        <div>
-            <label for="email">E-mail:</label>
-            
-            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
-        </div>
+    <main class="card">
+        <nav class="abas">
+            <a class="aba ativa" href="index.php?acao=login">Entrar</a>
+            <a class="aba" href="index.php?acao=cadastro">Registrar</a>
+        </nav>
 
-        <div>
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
-        </div>
+        <?php if (!empty($_SESSION['flash_error'])): ?>
+            <p class="mensagem erro"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+            <?php unset($_SESSION['flash_error']); ?>
+        <?php endif; ?>
 
-        <button type="submit">Entrar</button>
-    </form>
+        <?php if (!empty($_SESSION['flash_success'])): ?>
+            <p class="mensagem sucesso"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+            <?php unset($_SESSION['flash_success']); ?>
+        <?php endif; ?>
 
-    
-    <p>Não tem uma conta? <a href="index.php?acao=cadastro">Cadastre-se aqui</a>.</p>
+        <form action="index.php?acao=fazerLogin" method="post">
+            <input class="campo" type="email" name="email" placeholder="E-mail" aria-label="E-mail" autocomplete="email" required>
+            <input class="campo" type="password" name="senha" placeholder="Senha" aria-label="Senha" autocomplete="current-password" required>
+            <button class="botao" type="submit">Entrar</button>
+        </form>
+    </main>
 
 </body>
 </html>

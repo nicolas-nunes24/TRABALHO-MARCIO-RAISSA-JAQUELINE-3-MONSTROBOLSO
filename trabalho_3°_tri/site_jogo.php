@@ -1,3 +1,13 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (empty($_SESSION['usuario_id'])) {
+    header("Location: src/MVC/View/Usuario/index.php?acao=login");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,12 +20,13 @@
 
 <fieldset>
     <legend><h2>FORÇAMON</h2></legend>
+    <p>Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?>! <a href="src/MVC/View/Usuario/index.php?acao=logout">Sair</a></p>
     <button type="button" onclick="jogar()">Jogar</button>
 
     <h1>Monte seu time</h1>
     <button type="button" onclick="TrocaTela()">Time</button>
 
-    <!-- Novo Botão para a Forçadex -->
+    
     <h1>Forçadex</h1>
     <button type="button" onclick="abrirForcadex()">Acessar Forçadex</button>
 
@@ -36,13 +47,13 @@ function TrocaTela(){
     window.location.href = "monte_time.php";
 }
 
-// Função para abrir a Forçadex
+
 function abrirForcadex(){
     window.location.href = "aba-personagens.html";
 }
 
 function telaLojinha(){
-    window.location.href = "lojinha.php";
+    window.location.href = "src/MVC/View/Usuario/index.php?acao=dashboard";
 }
 </script>
 </body>
