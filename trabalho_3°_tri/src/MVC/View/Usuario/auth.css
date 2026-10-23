@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lilita+One&display=swap");
 
 :root {
-    /* Imagens (ficam na raiz do projeto, quatro pastas acima deste arquivo) */
     --fundo: url("../../../../fundo-imagem.jpg");
     --pokebola: url("../../../../pokebola.svg");
 
@@ -13,6 +12,7 @@
     --cor-texto-suave: #8b98a8;
     --cor-destaque: #2fb3f0;
     --cor-destaque-escura: #1d8cc0;
+    --cor-dourado: #e0aa2e;
     --cor-erro: #ff6b6b;
     --cor-sucesso: #4cd98a;
 }
@@ -26,16 +26,11 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 24px 16px;
     font-family: "Segoe UI", Arial, sans-serif;
     color: var(--cor-texto);
     background-color: var(--cor-fundo-pagina);
 }
 
-/* Imagem de fundo ocupando a tela, levemente desfocada e escurecida */
 body::before {
     content: "";
     position: fixed;
@@ -46,7 +41,87 @@ body::before {
     transform: scale(1.03);
 }
 
-/* Logo: letras amarelas coladas, com contorno azul e contorno externo escuro; o segundo "o" é a pokébola */
+.auth-conteudo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px 16px;
+}
+
+.cabecalho {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 32px;
+    min-height: 110px;
+    padding: 16px 32px;
+    background: #000000;
+}
+
+.cabecalho-logo {
+    font-family: "Lilita One", "Arial Black", Impact, sans-serif;
+    font-size: 3.4rem;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #ffcb05;
+    text-decoration: none;
+    -webkit-text-stroke: 0.14em #2a5db0;
+    paint-order: stroke fill;
+    filter: drop-shadow(0 0.05em 0 #12285a);
+}
+
+.cabecalho-menu,
+.cabecalho-usuario {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+}
+
+.cabecalho-menu {
+    margin-left: auto;
+}
+
+.cabecalho-usuario {
+    font-size: 0.9rem;
+    color: var(--cor-texto-suave);
+}
+
+.menu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--cor-texto);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.menu-link:hover,
+.menu-link.ativo {
+    color: var(--cor-dourado);
+}
+
+.menu-link.com-seta::after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    margin-top: -3px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+}
+
 .logo {
     margin: 0 0 12px;
     font-family: "Lilita One", "Arial Black", "Segoe UI Black", Impact, sans-serif;

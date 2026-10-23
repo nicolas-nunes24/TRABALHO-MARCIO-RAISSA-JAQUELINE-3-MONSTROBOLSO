@@ -1,7 +1,7 @@
 <?php
+session_start();
 $raiz = '../';
-$paginaAtual = 'criadores';
-require __DIR__ . '/../includes/protege.php';
+$paginaAtual = 'criadore';
 
 $criadores = [
     [
@@ -16,7 +16,6 @@ $criadores = [
         'bio'   => '',
         'foto'  => null,
     ],
-    
 ];
 ?>
 <!DOCTYPE html>

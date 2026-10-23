@@ -1,7 +1,7 @@
 <?php
+session_start();
 $raiz = '../';
-$paginaAtual = 'cartas';
-require __DIR__ . '/../includes/protege.php';
+$paginaAtual = 'carta';
 
 $pastaImagens = 'imagens-personagens/';
 
@@ -12,7 +12,6 @@ $tipos = [
     'eletrico' => 'Elétrico',
     'normal'   => 'Normal',
 ];
-
 
 $familias = [
     'Família do Fogo' => [

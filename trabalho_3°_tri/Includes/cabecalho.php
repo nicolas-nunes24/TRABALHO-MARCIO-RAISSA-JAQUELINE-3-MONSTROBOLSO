@@ -1,9 +1,11 @@
 <?php
+$logado = !empty($_SESSION['usuario_id']);
+$auth = $raiz . 'src/MVC/View/Usuario/index.php';
 
 $menu = [
-    'inicio'    => ['Início',    'site_jogo.php',           false],
-    'criadores' => ['Criadores', 'paginas/criadores.php',   true],
-    'cartas'    => ['Cartas',    'paginas/cartas.php',      true],
+    'inicio'    => ['Início',    'site_jogo.php',         false],
+    'criadores' => ['Criadores', 'paginas/criadores.php', true],
+    'cartas'    => ['Cartas',    'paginas/cartas.php',    true],
 ];
 ?>
 <header class="cabecalho">
@@ -17,7 +19,12 @@ $menu = [
     </nav>
 
     <div class="cabecalho-usuario">
-        <span>Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?></span>
-        <a class="menu-link" href="<?= $raiz ?>src/MVC/View/Usuario/index.php?acao=logout">Sair</a>
+        <?php if ($logado): ?>
+            <span>Olá, <?= htmlspecialchars($_SESSION['usuario_nome']) ?></span>
+            <a class="menu-link" href="<?= $auth ?>?acao=logout">Sair</a>
+        <?php else: ?>
+            <a class="menu-link<?= $paginaAtual === 'login' ? ' ativo' : '' ?>" href="<?= $auth ?>?acao=login">Entrar</a>
+            <a class="menu-link<?= $paginaAtual === 'cadastro' ? ' ativo' : '' ?>" href="<?= $auth ?>?acao=cadastro">Registrar</a>
+        <?php endif; ?>
     </div>
 </header>
