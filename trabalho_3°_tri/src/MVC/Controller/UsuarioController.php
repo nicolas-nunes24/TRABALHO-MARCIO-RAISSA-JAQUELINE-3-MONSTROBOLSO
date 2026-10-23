@@ -24,30 +24,31 @@ class UsuarioController {
     }
 
     public function registrar() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validaPost($_POST)) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirecionarComErro('cadastro', 'Requisição inválida.');
+        }
+
+        $nome  = trim($_POST['nome'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $senha = $_POST['senha'] ?? '';
+
+        if (empty($nome) || empty($email) || empty($senha)) {
             $this->redirecionarComErro('cadastro', 'Você deve preencher todos os campos.');
         }
 
-        $email = trim($_POST['email'] ?? '');
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->redirecionarComErro('cadastro', 'Por favor, insira um e-mail válido.');
-        }
-
         try {
-            $usuario = new Usuario(
-                trim($_POST['nome'] ?? ''),
-                $email,
-                $_POST['senha'] ?? '' 
-            );
+            $usuario = new Usuario($nome, $email, $senha);
             
-            $usuario->salvar();
-            
-            $_SESSION['flash_success'] = 'Cadastro realizado com sucesso! Faça login.';
-            header("Location: ?acao=login");
-            exit;
+            if ($usuario->salvar()) {
+                $_SESSION['flash_success'] = 'Cadastro realizado com sucesso!';
+                header("Location: ?acao=login");
+                exit;
+            } else {
+                $this->redirecionarComErro('cadastro', 'Erro ao salvar no banco de dados.');
+            }
 
         } catch (Exception $e) {
+            // Captura erros de validação da Model (ex: e-mail já cadastrado, senha curta)
             $this->redirecionarComErro('cadastro', $e->getMessage());
         }
     }
