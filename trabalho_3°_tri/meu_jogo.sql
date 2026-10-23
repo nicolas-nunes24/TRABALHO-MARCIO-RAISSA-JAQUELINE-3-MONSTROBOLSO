@@ -1,14 +1,16 @@
+DROP DATABASE meu_jogo;
 CREATE DATABASE if NOT EXISTS meu_jogo;
 USE meu_jogo;
 
-CREATE TABLE Usuario(
+CREATE TABLE if NOT EXISTS Usuario(
     id_Usuario int AUTO_INCREMENT PRIMARY KEY,
     nome  varchar(100) NOT NULL, 
     email varchar(150) UNIQUE NOT NULL,
-    senha varchar(150) NOT NULL 
+    senha varchar(150) NOT NULL ,
+    moedas int NOT NULL DEFAULT 0
 );
 
-CREATE TABLE Pokemon(
+CREATE TABLE if NOT EXISTS Pokemon(
     id_Pokemon int AUTO_INCREMENT PRIMARY KEY,
     nomePokemon varchar(30) NOT NULL,
     velocidade int NOT NULL,
@@ -22,7 +24,7 @@ CREATE TABLE Pokemon(
     statusAtual varchar(20) NOT NULL DEFAULT 'Saudável'
 );
 
-CREATE TABLE Loja(
+CREATE TABLE if NOT EXISTS Loja(
     id_item int AUTO_INCREMENT PRIMARY KEY,
     valorItem int NOT NULL,
     quantidadeItem int NOT NULL DEFAULT 0,

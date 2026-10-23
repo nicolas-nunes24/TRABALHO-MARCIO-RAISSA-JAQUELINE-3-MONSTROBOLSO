@@ -1,5 +1,5 @@
 <?php
-    require_once "/trabalho_3°_tri/config/autoload.php";
+    require_once __DIR__ . "/../../../../config/autoload.php";
 
     $acao = $_GET['acao'] ?? 'cadastro';
     

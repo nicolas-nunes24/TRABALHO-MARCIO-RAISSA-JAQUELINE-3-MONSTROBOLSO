@@ -1,170 +1,170 @@
-<?php
+    <?php
 
-require_once __DIR__ . "/trabalho_3°_tri/config/config.php";
+    require_once __DIR__ . "/../../../config/config.php";
 
-class Usuario {
+    class Usuario {
 
-    private $id;
-    private $nome;
-    private $email;
-    private $senha;
-    private $moedas;
+        private $id;
+        private $nome;
+        private $email;
+        private $senha;
+        private $moedas;
 
-    public function __construct(string $nome = null, string $email = null, string $senha = null) {
-        if ($nome === null && $email === null && $senha === null) return;
-        
-        $this->setNome($nome);
-        $this->setEmail($email);
-        $this->setSenha($senha);
-        $this->moedas = 0;
-    }
-
-    public static function getByColumn($valor, $coluna) {
-        $db = conexao();
-
-        $colunasPermitidas = ['id_usuario', 'nome', 'email'];
-
-        if (!in_array($coluna, $colunasPermitidas)) {
-            return false;
+        public function __construct(string $nome = null, string $email = null, string $senha = null) {
+            if ($nome === null && $email === null && $senha === null) return;
+            
+            $this->setNome($nome);
+            $this->setEmail($email);
+            $this->setSenha($senha);
+            $this->moedas = 0;
         }
 
-        $sql = "SELECT * FROM Usuario WHERE {$coluna} = :valor LIMIT 1";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':valor' => $valor]);
+        public static function getByColumn($valor, $coluna) {
+            $db = conexao();
 
-        $dados = $stmt->fetch(PDO::FETCH_ASSOC);
+            $colunasPermitidas = ['id_usuario', 'nome', 'email'];
 
-        if (!$dados) {
-            return null;
-        }
+            if (!in_array($coluna, $colunasPermitidas)) {
+                return false;
+            }
 
-        // Instancia e hidrata o objeto Usuario
-        $usuario = new self();
-        $usuario->id     = $dados['id_usuario'];
-        $usuario->nome   = $dados['nome'];
-        $usuario->email  = $dados['email'];
-        $usuario->senha  = $dados['senha'];
-        $usuario->moedas = $dados['moedas'];
-
-        return $usuario;
-    }
-
-    // Getters
-    public function getId() { return $this->id; }
-    public function getNome() { return $this->nome; }
-    public function getEmail() { return $this->email; }
-    public function getSenha() { return $this->senha; }
-    public function getMoedas() { return $this->moedas; }
-
-    // Setters com validações
-    public function setNome($nome) {
-        $this->validaNome($nome);
-        $this->nome = trim($nome);
-    }
-
-    public function setEmail($email) {
-        $this->validaEmail($email);
-        $this->email = strtolower(trim($email));
-    }
-
-    public function setSenha($senha) {
-        if (empty($senha) || strlen($senha) < 6) {
-            throw new Exception("A senha deve ter no mínimo 6 caracteres");
-        }
-        $this->senha = password_hash($senha, PASSWORD_DEFAULT);
-    }
-
-    public function setMoedas($moedas) {
-        $this->moedas = (int) $moedas;
-    }
-
-    public function salvar() {
-        return $this->cadastrar();
-    }
-
-    public function cadastrar() {
-        $db = conexao();                
-        if ($this->id) {
-            $sql = "UPDATE Usuario SET nome = :nome, email = :email, senha = :senha, moedas = :moeda WHERE id_usuario = :id";
+            $sql = "SELECT * FROM Usuario WHERE {$coluna} = :valor LIMIT 1";
             $stmt = $db->prepare($sql);
-            return $stmt->execute([
+            $stmt->execute([':valor' => $valor]);
+
+            $dados = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$dados) {
+                return null;
+            }
+
+            // Instancia e hidrata o objeto Usuario
+            $usuario = new self();
+            $usuario->id     = $dados['id_usuario'];
+            $usuario->nome   = $dados['nome'];
+            $usuario->email  = $dados['email'];
+            $usuario->senha  = $dados['senha'];
+            $usuario->moedas = $dados['moedas'];
+
+            return $usuario;
+        }
+
+        // Getters
+        public function getId() { return $this->id; }
+        public function getNome() { return $this->nome; }
+        public function getEmail() { return $this->email; }
+        public function getSenha() { return $this->senha; }
+        public function getMoedas() { return $this->moedas; }
+
+        // Setters com validações
+        public function setNome($nome) {
+            $this->validaNome($nome);
+            $this->nome = trim($nome);
+        }
+
+        public function setEmail($email) {
+            $this->validaEmail($email);
+            $this->email = strtolower(trim($email));
+        }
+
+        public function setSenha($senha) {
+            if (empty($senha) || strlen($senha) < 6) {
+                throw new Exception("A senha deve ter no mínimo 6 caracteres");
+            }
+            $this->senha = password_hash($senha, PASSWORD_DEFAULT);
+        }
+
+        public function setMoedas($moedas) {
+            $this->moedas = (int) $moedas;
+        }
+
+        public function salvar() {
+            return $this->cadastrar();
+        }
+
+        public function cadastrar() {
+            $db = conexao();                
+            if ($this->id) {
+                $sql = "UPDATE Usuario SET nome = :nome, email = :email, senha = :senha, moedas = :moeda WHERE id_usuario = :id";
+                $stmt = $db->prepare($sql);
+                return $stmt->execute([
+                    ':nome'  => $this->nome,
+                    ':email' => $this->email,
+                    ':senha' => $this->senha,
+                    ':moeda' => $this->moedas,
+                    ':id'    => $this->id
+                ]);
+            }
+            
+            $sql = "INSERT INTO Usuario (nome, email, senha, moedas) VALUES (:nome, :email, :senha, :moeda)";
+            $stmt = $db->prepare($sql);
+            $resultado = $stmt->execute([
                 ':nome'  => $this->nome,
                 ':email' => $this->email,
                 ':senha' => $this->senha,
-                ':moeda' => $this->moedas,
-                ':id'    => $this->id
+                ':moeda' => $this->moedas
             ]);
+
+            if ($resultado) {
+                $this->id = (int) $db->lastInsertId();
+            }
+            return $resultado;
+        }
+
+        public function load($id) {
+            $db = conexao();
+            $stmt = $db->prepare("SELECT * FROM Usuario WHERE id_usuario = :id");
+            $stmt->execute([':id' => $id]);
+            
+            if ($dados = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $this->id     = $dados['id_usuario'];
+                $this->nome   = $dados['nome']; 
+                $this->email  = $dados['email'];
+                $this->senha  = $dados['senha'];
+                $this->moedas = $dados['moedas'];
+                return true;
+            }
+            return false;
+        }
+
+        public function delete() {
+            if (!$this->id) return false;
+            $db = conexao();
+            $stmt = $db->prepare("DELETE FROM Usuario WHERE id_usuario = :id");
+            return $stmt->execute([':id' => $this->id]);
         }
         
-        $sql = "INSERT INTO Usuario (nome, email, senha, moedas) VALUES (:nome, :email, :senha, :moeda)";
-        $stmt = $db->prepare($sql);
-        $resultado = $stmt->execute([
-            ':nome'  => $this->nome,
-            ':email' => $this->email,
-            ':senha' => $this->senha,
-            ':moeda' => $this->moedas
-        ]);
+        public function validaNome($nome) {
+            $nome = trim($nome);
 
-        if ($resultado) {
-            $this->id = (int) $db->lastInsertId();
-        }
-        return $resultado;
-    }
+            if (mb_strlen($nome, 'UTF-8') < 3 || mb_strlen($nome, 'UTF-8') > 20) {
+                throw new Exception("Nome de usuário deve ter entre 3 e 20 caracteres");
+            }
 
-    public function load($id) {
-        $db = conexao();
-        $stmt = $db->prepare("SELECT * FROM Usuario WHERE id_usuario = :id");
-        $stmt->execute([':id' => $id]);
-        
-        if ($dados = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->id     = $dados['id_usuario'];
-            $this->nome   = $dados['nome']; 
-            $this->email  = $dados['email'];
-            $this->senha  = $dados['senha'];
-            $this->moedas = $dados['moedas'];
-            return true;
-        }
-        return false;
-    }
+            if (!preg_match('/^[\p{L}\s-]+$/u', $nome)) {
+                throw new Exception("O nome de usuário não pode conter caracteres especiais ou números");
+            }
 
-    public function delete() {
-        if (!$this->id) return false;
-        $db = conexao();
-        $stmt = $db->prepare("DELETE FROM Usuario WHERE id_usuario = :id");
-        return $stmt->execute([':id' => $this->id]);
-    }
-    
-    public function validaNome($nome) {
-        $nome = trim($nome);
-
-        if (mb_strlen($nome, 'UTF-8') < 3 || mb_strlen($nome, 'UTF-8') > 20) {
-            throw new Exception("Nome de usuário deve ter entre 3 e 20 caracteres");
+            $usuarioExistente = self::getByColumn($nome, 'nome');
+            if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
+                throw new Exception('Este nome já está cadastrado');
+            }
         }
 
-        if (!preg_match('/^[\p{L}\s-]+$/u', $nome)) {
-            throw new Exception("O nome de usuário não pode conter caracteres especiais ou números");
-        }
+        public function validaEmail($email) {
+            $email = trim($email);
 
-        $usuarioExistente = self::getByColumn($nome, 'nome');
-        if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
-            throw new Exception('Este nome já está cadastrado');
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception('O email informado é inválido');
+            }
+
+            if (strlen($email) > 120) {
+                throw new Exception("O email digitado excede o limite de 120 caracteres");
+            }
+
+            $usuarioExistente = self::getByColumn($email, 'email');
+            if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
+                throw new Exception('Este email já está cadastrado');
+            }
         }
     }
-
-    public function validaEmail($email) {
-        $email = trim($email);
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new Exception('O email informado é inválido');
-        }
-
-        if (strlen($email) > 120) {
-            throw new Exception("O email digitado excede o limite de 120 caracteres");
-        }
-
-        $usuarioExistente = self::getByColumn($email, 'email');
-        if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
-            throw new Exception('Este email já está cadastrado');
-        }
-    }
-}

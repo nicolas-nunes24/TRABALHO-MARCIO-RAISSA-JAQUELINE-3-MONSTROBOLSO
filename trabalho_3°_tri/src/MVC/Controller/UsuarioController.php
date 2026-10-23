@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/../models/Usuario.php";
+require_once __DIR__ . "/../Model/Usuario.php";
 
 class UsuarioController {
 
@@ -12,7 +12,7 @@ class UsuarioController {
 
     private function renderizar($view, $dados = []) {
         extract($dados);
-        require_once __DIR__ . "/../Views/usuario/$view.php";
+        require_once __DIR__ . "/../View/Usuario/$view.php";
     }
 
     public function cadastro() {
