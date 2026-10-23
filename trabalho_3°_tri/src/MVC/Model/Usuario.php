@@ -28,58 +28,7 @@
                 return false;
             }
 
-<<<<<<< HEAD
             $sql = "SELECT * FROM Usuario WHERE {$coluna} = :valor LIMIT 1";
-=======
-        
-        $usuario = new self();
-        $usuario->id     = (int) $dados['id_usuario'];
-        $usuario->nome   = $dados['nome'];
-        $usuario->email  = $dados['email'];
-        $usuario->senha  = $dados['senha']; 
-        $usuario->moedas = (int) $dados['moedas'];
-
-        return $usuario;
-    }
-
-    public function getId() { return $this->id; }
-    public function getNome() { return $this->nome; }
-    public function getEmail() { return $this->email; }
-    public function getSenha() { return $this->senha; }
-    public function getMoedas() { return $this->moedas; }
-
-    
-    public function setNome($nome) {
-        $this->validaNome($nome);
-        $this->nome = trim($nome);
-    }
-
-    public function setEmail($email) {
-        $this->validaEmail($email);
-        $this->email = strtolower(trim($email));
-    }
-
-    public function setSenha($senha) {
-        if (empty($senha) || strlen($senha) < 6) {
-            throw new Exception("A senha deve ter no mínimo 6 caracteres");
-        }
-        
-        $this->senha = password_hash($senha, PASSWORD_DEFAULT);
-    }
-
-    public function setMoedas($moedas) {
-        $this->moedas = (int) $moedas;
-    }
-
-    public function salvar() {
-        return $this->cadastrar();
-    }
-
-    public function cadastrar() {
-        $db = conexao();                
-        if ($this->id) {
-            $sql = "UPDATE Usuario SET nome = :nome, email = :email, senha = :senha, moedas = :moeda WHERE id_usuario = :id";
->>>>>>> 79f7883b41261b29acac70dd18f86864678bb739
             $stmt = $db->prepare($sql);
             $stmt->execute([':valor' => $valor]);
 
@@ -192,27 +141,9 @@
                 throw new Exception("Nome de usuário deve ter entre 3 e 20 caracteres");
             }
 
-<<<<<<< HEAD
             if (!preg_match('/^[\p{L}\s-]+$/u', $nome)) {
                 throw new Exception("O nome de usuário não pode conter caracteres especiais ou números");
             }
-=======
-    public function load($id) {
-        $db = conexao();
-        $stmt = $db->prepare("SELECT * FROM Usuario WHERE id_usuario = :id");
-        $stmt->execute([':id' => $id]);
-        
-        if ($dados = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $this->id     = (int) $dados['id_usuario'];
-            $this->nome   = $dados['nome']; 
-            $this->email  = $dados['email'];
-            $this->senha  = $dados['senha'];
-            $this->moedas = (int) $dados['moedas'];
-            return true;
-        }
-        return false;
-    }
->>>>>>> 79f7883b41261b29acac70dd18f86864678bb739
 
             $usuarioExistente = self::getByColumn($nome, 'nome');
             if (!empty($usuarioExistente) && $usuarioExistente->getId() != $this->id) {
@@ -220,15 +151,8 @@
             }
         }
 
-<<<<<<< HEAD
         public function validaEmail($email) {
             $email = trim($email);
-=======
-        
-        if (!preg_match('/^[a-zA-Z0-9_-]+$/u', $nome)) {
-            throw new Exception("O nome de usuário pode conter apenas letras, números, hífen e underline");
-        }
->>>>>>> 79f7883b41261b29acac70dd18f86864678bb739
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception('O email informado é inválido');
