@@ -28,15 +28,22 @@ class UsuarioController {
             $this->redirecionarComErro('cadastro', 'Você deve preencher todos os campos.');
         }
 
+        $email = trim($_POST['email'] ?? '');
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->redirecionarComErro('cadastro', 'Por favor, insira um e-mail válido.');
+        }
+
         try {
-            // Passa os 3 parâmetros aceitos pelo construtor da Model (nome, email, senha)
             $usuario = new Usuario(
-                $_POST['nome'] ?? '',
-                $_POST['email'] ?? '',
-                $_POST['senha'] ?? ''
+                trim($_POST['nome'] ?? ''),
+                $email,
+                $_POST['senha'] ?? '' 
             );
             
             $usuario->salvar();
+            
+            $_SESSION['flash_success'] = 'Cadastro realizado com sucesso! Faça login.';
             header("Location: ?acao=login");
             exit;
 
@@ -50,21 +57,42 @@ class UsuarioController {
             $this->redirecionarComErro('login', 'Você deve preencher todos os campos.');
         }
 
-        $email = trim($_POST['email']);
-        $senha = $_POST['senha'];
+        $loginInput = trim($_POST['email'] ?? $_POST['login'] ?? '');
+        $senha = $_POST['senha'] ?? '';
 
-        // Busca o usuário por email
-        $user = Usuario::getByColumn($email, 'email');
+        try {
+          
+            $user = Usuario::getByLoginOrEmail($loginInput);
 
-        if ($user && password_verify($senha, $user->getSenha())) {
-            $_SESSION['usuario_id'] = $user->getId();
-            $_SESSION['usuario_nome'] = $user->getNome();
-            
-            header("Location: ?acao=dashboard");
-            exit;
+            if ($user && password_verify($senha, $user->getSenha())) {
+                session_regenerate_id(true);
+
+                $_SESSION['usuario_id'] = $user->getId();
+                $_SESSION['usuario_nome'] = $user->getNome();
+                
+                header("Location: ?acao=dashboard");
+                exit;
+            }
+
+            $this->redirecionarComErro('login', 'Usuário/E-mail ou senha incorretos.');
+
+        } catch (Exception $e) {
+            $this->redirecionarComErro('login', 'Erro ao processar login: ' . $e->getMessage());
         }
+    }
 
-        $this->redirecionarComErro('login', 'Usuário ou senha incorretos.');
+    public function logout() {
+        $_SESSION = [];
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        session_destroy();
+        header("Location: ?acao=login");
+        exit;
     }
 
     private function validaPost($post) {
@@ -72,9 +100,16 @@ class UsuarioController {
             return false;
         }
 
-        foreach ($post as $dado) {
-            if (!isset($dado) || trim($dado) === '') {
-                return false;
+        foreach ($post as $chave => $dado) {
+           
+            if ($chave === 'senha') {
+                if (!isset($dado) || $dado === '') {
+                    return false;
+                }
+            } else {
+                if (!isset($dado) || trim($dado) === '') {
+                    return false;
+                }
             }
         }
         return true;
