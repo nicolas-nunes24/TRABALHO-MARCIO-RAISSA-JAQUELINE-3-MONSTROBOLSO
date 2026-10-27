@@ -35,9 +35,7 @@ class UsuarioController {
             $this->logout();
         }
 
-        $moeda = $usuario->getMoedas();
-
-        $this->renderizar('../Loja/lojinha', ['moeda' => $moeda]);
+        $this->renderizar('../Loja/lojinha', ['moeda' => $usuario->getMoedas()]);
     }
 
     public function registrar() {
@@ -49,38 +47,39 @@ class UsuarioController {
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
 
-        if (empty($nome) || empty($email) || empty($senha)) {
-            $this->redirecionarComErro('cadastro', 'Você deve preencher todos os campos.');
+        if (!$nome || !$email || !$senha) {
+            $this->redirecionarComErro('cadastro', 'Preencha todos os campos.');
         }
 
         try {
             $usuario = new Usuario($nome, $email, $senha);
             
             if ($usuario->salvar()) {
-                $_SESSION['flash_success'] = 'Cadastro realizado com sucesso!';
+                $_SESSION['flash_success'] = 'Conta criada com sucesso!';
                 header("Location: ?acao=login");
                 exit;
-            } else {
-                $this->redirecionarComErro('cadastro', 'Erro ao salvar no banco de dados.');
             }
 
+            $this->redirecionarComErro('cadastro', 'Erro ao salvar os dados.');
         } catch (Exception $e) {
-         
             $this->redirecionarComErro('cadastro', $e->getMessage());
         }
     }
 
     public function fazerLogin() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validaPost($_POST)) {
-            $this->redirecionarComErro('login', 'Você deve preencher todos os campos.');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirecionarComErro('login', 'Requisição inválida.');
         }
 
-        $loginInput = trim($_POST['email'] ?? $_POST['login'] ?? '');
+        $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
 
+        if (!$email || !$senha) {
+            $this->redirecionarComErro('login', 'Informe seu e-mail e senha.');
+        }
+
         try {
-          
-            $user = Usuario::getByColumn(strtolower($loginInput), 'email');
+            $user = Usuario::getByColumn(strtolower($email), 'email');
 
             if ($user && password_verify($senha, $user->getSenha())) {
                 session_regenerate_id(true);
@@ -92,10 +91,9 @@ class UsuarioController {
                 exit;
             }
 
-            $this->redirecionarComErro('login', 'Usuário/E-mail ou senha incorretos.');
-
+            $this->redirecionarComErro('login', 'E-mail ou senha incorretos.');
         } catch (Exception $e) {
-            $this->redirecionarComErro('login', 'Erro ao processar login: ' . $e->getMessage());
+            $this->redirecionarComErro('login', 'Erro no login: ' . $e->getMessage());
         }
     }
 
@@ -111,26 +109,6 @@ class UsuarioController {
         session_destroy();
         header("Location: ?acao=login");
         exit;
-    }
-
-    private function validaPost($post) {
-        if (empty($post)) {
-            return false;
-        }
-
-        foreach ($post as $chave => $dado) {
-           
-            if ($chave === 'senha') {
-                if (!isset($dado) || $dado === '') {
-                    return false;
-                }
-            } else {
-                if (!isset($dado) || trim($dado) === '') {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private function redirecionarComErro($acao, $mensagem) {

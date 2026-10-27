@@ -15,7 +15,9 @@
     ?>
 
     <div class="auth-conteudo">
-        <h1 class="logo" aria-label="Forçamon">Forçam<span class="logo-o"></span>n</h1>
+        <div class="logo-container">
+            <img class="logo-img" src="<?= $raiz ?>Forcamon.png" alt="Forçamon">
+        </div>
 
         <main class="card">
             <nav class="abas">
@@ -24,19 +26,28 @@
             </nav>
 
             <?php if (!empty($_SESSION['flash_error'])): ?>
-                <p class="mensagem erro"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+                <div class="mensagem erro"><?= htmlspecialchars($_SESSION['flash_error']) ?></div>
                 <?php unset($_SESSION['flash_error']); ?>
             <?php endif; ?>
 
             <?php if (!empty($_SESSION['flash_success'])): ?>
-                <p class="mensagem sucesso"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+                <div class="mensagem sucesso"><?= htmlspecialchars($_SESSION['flash_success']) ?></div>
                 <?php unset($_SESSION['flash_success']); ?>
             <?php endif; ?>
 
-            <form action="index.php?acao=fazerLogin" method="post">
-                <input class="campo" type="email" name="email" placeholder="E-mail" aria-label="E-mail" autocomplete="email" required>
-                <input class="campo" type="password" name="senha" placeholder="Senha" aria-label="Senha" autocomplete="current-password" required>
+            <form class="form-auth" action="index.php?acao=fazerLogin" method="post">
+                <input class="campo" type="text" name="email" placeholder="Usuário ou Email:" required>
+                <input class="campo" type="password" name="senha" placeholder="Senha:" required>
+
                 <button class="botao" type="submit">Entrar</button>
+
+                <div class="form-rodape">
+                    <a href="#" class="link-esqueci">Esqueci minha senha</a>
+                    
+                    <div class="divisor-linha"></div>
+
+            
+                </div>
             </form>
         </main>
     </div>

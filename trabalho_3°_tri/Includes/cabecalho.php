@@ -3,13 +3,13 @@ $logado = !empty($_SESSION['usuario_id']);
 $auth = $raiz . 'src/MVC/View/Usuario/index.php';
 
 $menu = [
-    'inicio'    => ['Início',    'site_jogo.php',         false],
-    'criadores' => ['Criadores', 'paginas/criadores.php', true],
-    'cartas'    => ['Cartas',    'paginas/cartas.php',    true],
+    'inicio' => ['Início', 'site_jogo.php', false],
 ];
 ?>
 <header class="cabecalho">
-    <a class="cabecalho-logo" href="<?= $raiz ?>site_jogo.php" aria-label="Forçamon">Forçam<span class="logo-o"></span>n</a>
+    <a class="cabecalho-logo" href="<?= $raiz ?>site_jogo.php" aria-label="Forçamon">
+        <img src="<?= $raiz ?>Forcamon.png" alt="Forçamon" style="height: 45px; width: auto;">
+    </a>
 
     <nav class="cabecalho-menu">
         <?php foreach ($menu as $chave => [$titulo, $destino, $temSeta]): ?>
