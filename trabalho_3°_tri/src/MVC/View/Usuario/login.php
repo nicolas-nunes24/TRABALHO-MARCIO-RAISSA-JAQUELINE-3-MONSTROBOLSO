@@ -1,3 +1,7 @@
+<?php
+$raiz = '../../../../';
+$paginaAtual = 'login';
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,22 +12,17 @@
 </head>
 <body>
 
-    <?php
-    $raiz = '../../../../';
-    $paginaAtual = 'login';
-    require $raiz . 'includes/cabecalho.php';
-    ?>
+  
+    <a href="<?= $raiz ?>index.php" class="logo-topo-esquerdo">
+        <img class="logo-topo-img" src="<?= $raiz ?>Forcamon.png" alt="Forçamon">
+    </a>
 
     <div class="auth-conteudo">
-        <div class="logo-container">
-            <img class="logo-img" src="<?= $raiz ?>Forcamon.png" alt="Forçamon">
-        </div>
-
         <main class="card">
-            <nav class="abas">
-                <a class="aba ativa" href="index.php?acao=login">Entrar</a>
-                <a class="aba" href="index.php?acao=cadastro">Registrar</a>
-            </nav>
+            
+            <div class="card-header-img">
+                <img src="<?= $raiz ?>faca_seu_login.png" alt="Faça seu Login">
+            </div>
 
             <?php if (!empty($_SESSION['flash_error'])): ?>
                 <div class="mensagem erro"><?= htmlspecialchars($_SESSION['flash_error']) ?></div>
@@ -46,7 +45,10 @@
                     
                     <div class="divisor-linha"></div>
 
-            
+                    <div class="bloco-cadastro">
+                        <span class="texto-cadastro">Não tem uma conta?</span>
+                        <a href="index.php?acao=cadastro" class="link-cadastre-se">Cadastre-se</a>
+                    </div>
                 </div>
             </form>
         </main>

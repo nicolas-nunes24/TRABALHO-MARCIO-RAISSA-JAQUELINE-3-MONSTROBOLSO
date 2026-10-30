@@ -1,7 +1,8 @@
 <?php
-    require_once __DIR__ . "/../../../../config/autoload.php";
+require_once __DIR__ . "/../../../../config/autoload.php";
 
-$acao = $_GET['acao'] ?? 'cadastro';
+
+$acao = $_GET['acao'] ?? 'login';
 
 $controller = new UsuarioController();
 

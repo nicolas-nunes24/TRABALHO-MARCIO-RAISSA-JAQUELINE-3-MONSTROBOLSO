@@ -1,19 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
     --bg-imagem: url("../../../../fundo-imagem.jpg");
 
-    --cor-fundo: #0c1017;
-    --cor-card: #18222d;
-    --cor-campo: #111822;
-    --cor-borda: #253344;
-    --cor-borda-foco: #28a8ea;
+    --cor-fundo: #080c12;
+    --cor-card: #121924;
+    --cor-campo: #0a0e16;
+    --cor-borda: #1e2a3a;
+    --cor-borda-foco: #2a82c5;
     --cor-texto: #ffffff;
-    --cor-subtexto: #8a9ba8;
-    --cor-azul-destaque: #2aaae8;
-    --cor-azul-hover: #1b9ada;
-    --cor-erro: #ff5555;
-    --cor-sucesso: #22c55e;
+    --cor-subtexto: #7e8f9f;
+    --cor-botao: #2073b5;
+    --cor-botao-hover: #19619b;
+    --cor-botao-sombra: #104169;
 }
 
 * {
@@ -29,6 +28,8 @@ body {
     font-family: "Inter", system-ui, -apple-system, sans-serif;
     color: var(--cor-texto);
     background-color: var(--cor-fundo);
+    position: relative;
+    overflow-x: hidden;
 }
 
 body::before {
@@ -37,9 +38,31 @@ body::before {
     inset: 0;
     z-index: -1;
     background: var(--bg-imagem) center / cover no-repeat;
-    filter: blur(4px) brightness(0.6);
-    transform: scale(1.05);
+    filter: brightness(0.65) contrast(1.1);
 }
+
+
+.logo-topo-esquerdo {
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    z-index: 10;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logo-topo-img {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
+    transition: transform 0.15s ease;
+}
+
+.logo-topo-img:hover {
+    transform: scale(1.03);
+}
+
 
 .auth-conteudo {
     flex: 1;
@@ -50,60 +73,35 @@ body::before {
     padding: 2rem 1rem;
 }
 
-/* Logo */
-.logo-container {
-    margin-bottom: 1.5rem;
-    text-align: center;
+
+.card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--cor-card);
+    border: 3px solid var(--cor-borda);
+    border-radius: 16px;
+    padding: 2.25rem 2rem 1.75rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
 }
 
-.logo-img {
-    max-width: 260px;
+
+.card-header-img {
+    text-align: center;
+    margin-bottom: 1.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-header-img img {
+    max-width: 320px;
     width: 100%;
     height: auto;
     display: block;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
 }
 
-/* Card */
-.card {
-    width: 100%;
-    max-width: 380px;
-    background: var(--cor-card);
-    border: 1px solid var(--cor-borda);
-    border-radius: 12px;
-    padding: 2rem 1.75rem 1.5rem;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
-}
 
-/* Abas estilo imagem */
-.abas {
-    display: flex;
-    border-bottom: 1px solid var(--cor-borda);
-    margin-bottom: 1.75rem;
-}
-
-.aba {
-    flex: 1;
-    text-align: center;
-    padding: 10px 0 14px;
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: var(--cor-subtexto);
-    text-decoration: none;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s ease;
-}
-
-.aba:hover {
-    color: var(--cor-texto);
-}
-
-.aba.ativa {
-    color: var(--cor-texto);
-    border-bottom-color: var(--cor-azul-destaque);
-}
-
-/* Formulário */
 .form-auth {
     display: flex;
     flex-direction: column;
@@ -112,54 +110,59 @@ body::before {
 
 .campo {
     width: 100%;
-    padding: 14px 16px;
+    padding: 15px 18px;
     font-size: 0.95rem;
     font-family: inherit;
     color: var(--cor-texto);
     background: var(--cor-campo);
-    border: 1px solid var(--cor-borda);
-    border-radius: 8px;
+    border: 2px solid var(--cor-borda);
+    border-radius: 10px;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease;
 }
 
 .campo::placeholder {
-    color: #5d6f80;
+    color: #485666;
 }
 
 .campo:focus {
     border-color: var(--cor-borda-foco);
 }
 
+
 .botao {
-    margin-top: 0.5rem;
-    padding: 14px;
-    font-size: 1.05rem;
-    font-weight: 700;
+    margin-top: 0.4rem;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 800;
     font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: #ffffff;
-    background: var(--cor-azul-destaque);
+    background: var(--cor-botao);
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 5px 0 var(--cor-botao-sombra);
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .botao:hover {
-    background: var(--cor-azul-hover);
+    background: var(--cor-botao-hover);
 }
 
 .botao:active {
-    transform: scale(0.99);
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--cor-botao-sombra);
 }
 
-/* Rodapé do Form */
+
 .form-rodape {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
-    margin-top: 1.25rem;
+    gap: 1.1rem;
+    margin-top: 1.1rem;
 }
 
 .link-esqueci {
@@ -175,54 +178,45 @@ body::before {
 
 .divisor-linha {
     width: 100%;
-    height: 1px;
+    height: 2px;
     background-color: var(--cor-borda);
 }
 
-.idiomas {
+.bloco-cadastro {
     display: flex;
-    gap: 12px;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
 }
 
-.bandeira {
-    width: 24px;
-    height: 16px;
-    border-radius: 2px;
-    object-fit: cover;
-    opacity: 0.8;
-    transition: opacity 0.2s, transform 0.2s;
-    cursor: pointer;
+.texto-cadastro {
+    color: var(--cor-subtexto);
 }
 
-.bandeira:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.link-versao {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--cor-texto);
+.link-cadastre-se {
+    color: var(--cor-borda-foco);
+    font-weight: 700;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-.link-versao:hover {
+.link-cadastre-se:hover {
     text-decoration: underline;
 }
 
-/* Alertas */
+
 .mensagem {
     padding: 12px;
     font-size: 0.9rem;
     border-radius: 8px;
     margin-bottom: 1rem;
     text-align: center;
+    font-weight: 600;
 }
 
 .mensagem.erro {
-    color: #ffaaaa;
+    color: #ff8888;
     background: rgba(255, 85, 85, 0.15);
     border: 1px solid rgba(255, 85, 85, 0.3);
 }
