@@ -1,18 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
 
 :root {
     --bg-imagem: url("../../../../fundo-imagem.jpg");
 
-    --cor-fundo: #080c12;
-    --cor-card: #121924;
-    --cor-campo: #0a0e16;
-    --cor-borda: #1e2a3a;
-    --cor-borda-foco: #2a82c5;
-    --cor-texto: #ffffff;
-    --cor-subtexto: #7e8f9f;
-    --cor-botao: #2073b5;
-    --cor-botao-hover: #19619b;
-    --cor-botao-sombra: #104169;
+    --cor-card: #18212c;
+    --cor-campo: #111820;
+    --cor-borda: #2a3644;
+    --cor-destaque: #4a8dbd;
+    --cor-destaque-hover: #5a9bc9;
+    --cor-destaque-base: #28557a;
+    --cor-texto: #eef2f6;
+    --cor-suave: #a2b0be;
 }
 
 * {
@@ -23,206 +21,235 @@
 
 body {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: "Nunito", system-ui, sans-serif;
     color: var(--cor-texto);
-    background-color: var(--cor-fundo);
-    position: relative;
-    overflow-x: hidden;
+    background: #0d1218;
 }
 
+/* Fundo desfocado, como na tela do jogo */
 body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    inset: -10px;
     z-index: -1;
     background: var(--bg-imagem) center / cover no-repeat;
-    filter: brightness(0.65) contrast(1.1);
+    filter: blur(3px) brightness(0.6);
 }
 
 
-.logo-topo-esquerdo {
-    position: absolute;
-    top: 24px;
-    left: 28px;
-    z-index: 10;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.logo-topo-img {
-    height: 80px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
-    transition: transform 0.15s ease;
-}
-
-.logo-topo-img:hover {
-    transform: scale(1.03);
-}
-
-
-.auth-conteudo {
-    flex: 1;
+.auth {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.6rem;
     padding: 2rem 1rem;
 }
 
+.logo img {
+    display: block;
+    height: 110px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+}
+
+.divisor {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 0.2rem;
+}
+
+.divisor::before,
+.divisor::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to var(--lado), rgba(255, 255, 255, 0.35), transparent);
+}
+
+.divisor::before {
+    --lado: left;
+}
+
+.divisor::after {
+    --lado: right;
+}
+
+.divisor img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
 
 .card {
     width: 100%;
-    max-width: 440px;
-    background: var(--cor-card);
-    border: 3px solid var(--cor-borda);
-    border-radius: 16px;
-    padding: 2.25rem 2rem 1.75rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    max-width: 460px;
+    padding: 0.5rem 2rem 2rem;
+    background: rgba(18, 26, 36, 0.5);
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
-
-.card-header-img {
-    text-align: center;
-    margin-bottom: 1.75rem;
+.abas {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.card-header-img img {
-    max-width: 320px;
-    width: 100%;
-    height: auto;
-    display: block;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+.abas a {
+    flex: 1;
+    padding: 1.1rem 0 0.9rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-suave);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
 }
 
+.abas a:hover {
+    color: var(--cor-texto);
+}
 
-.form-auth {
+.abas a.ativa {
+    color: var(--cor-texto);
+    border-bottom-color: var(--cor-destaque);
+}
+
+.form {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 1rem;
 }
 
 .campo {
     width: 100%;
-    padding: 15px 18px;
-    font-size: 0.95rem;
-    font-family: inherit;
+    padding: 1rem 1.1rem;
+    font: inherit;
+    font-weight: 600;
     color: var(--cor-texto);
-    background: var(--cor-campo);
-    border: 2px solid var(--cor-borda);
-    border-radius: 10px;
-    outline: none;
-    transition: border-color 0.2s ease;
+    background: rgba(8, 12, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    transition: border-color 0.15s, background-color 0.15s;
 }
 
 .campo::placeholder {
-    color: #485666;
+    color: var(--cor-suave);
+    font-weight: 400;
 }
 
 .campo:focus {
-    border-color: var(--cor-borda-foco);
+    outline: none;
+    border-color: var(--cor-destaque);
+    background: rgba(8, 12, 18, 0.75);
 }
 
-
+/* Botão com "degrau" embaixo, que afunda ao clicar */
 .botao {
-    margin-top: 0.4rem;
-    padding: 16px;
-    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    padding: 0.95rem;
+    font: inherit;
+    font-size: 1.15rem;
     font-weight: 800;
-    font-family: inherit;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #ffffff;
-    background: var(--cor-botao);
+    color: #fff;
+    background: var(--cor-destaque);
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 var(--cor-destaque-base);
     cursor: pointer;
-    box-shadow: 0 5px 0 var(--cor-botao-sombra);
-    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+    transition: background-color 0.15s, transform 0.08s, box-shadow 0.08s;
 }
 
 .botao:hover {
-    background: var(--cor-botao-hover);
+    background: var(--cor-destaque-hover);
 }
 
 .botao:active {
     transform: translateY(3px);
-    box-shadow: 0 2px 0 var(--cor-botao-sombra);
+    box-shadow: 0 1px 0 var(--cor-destaque-base);
 }
 
+.botao:focus-visible,
+.abas a:focus-visible,
+.link-esqueci:focus-visible {
+    outline: 2px solid var(--cor-destaque-hover);
+    outline-offset: 3px;
+}
 
-.form-rodape {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.1rem;
-    margin-top: 1.1rem;
+.card-titulo {
+    margin: 1.4rem 0 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.card-texto {
+    margin-bottom: 1.4rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--cor-suave);
 }
 
 .link-esqueci {
-    font-size: 0.9rem;
-    color: var(--cor-subtexto);
+    display: block;
+    margin-top: 1.25rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--cor-suave);
     text-decoration: none;
-    transition: color 0.2s;
 }
 
 .link-esqueci:hover {
     color: var(--cor-texto);
 }
 
-.divisor-linha {
-    width: 100%;
-    height: 2px;
-    background-color: var(--cor-borda);
-}
-
-.bloco-cadastro {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 0.95rem;
-}
-
-.texto-cadastro {
-    color: var(--cor-subtexto);
-}
-
-.link-cadastre-se {
-    color: var(--cor-borda-foco);
-    font-weight: 700;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.link-cadastre-se:hover {
-    text-decoration: underline;
-}
-
-
 .mensagem {
-    padding: 12px;
-    font-size: 0.9rem;
-    border-radius: 8px;
     margin-bottom: 1rem;
-    text-align: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid;
 }
 
 .mensagem.erro {
-    color: #ff8888;
-    background: rgba(255, 85, 85, 0.15);
-    border: 1px solid rgba(255, 85, 85, 0.3);
+    color: #e8a0a0;
+    background: rgba(200, 80, 80, 0.12);
+    border-color: rgba(200, 80, 80, 0.35);
 }
 
 .mensagem.sucesso {
-    color: #86efac;
-    background: rgba(34, 197, 94, 0.15);
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #a3d4b0;
+    background: rgba(80, 160, 110, 0.12);
+    border-color: rgba(80, 160, 110, 0.35);
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 0.25rem 1.25rem 1.5rem;
+    }
+
+    .logo img {
+        height: 84px;
+    }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+    .card {
+        background: rgba(18, 26, 36, 0.92);
+    }
 }
