@@ -4,6 +4,16 @@
   
     --fundo: url("../fundo-imagem.jpg");
     --pokebola: url("../pokebola.svg");
+    --fundo-pokemon: url("../bg-pokemon.jpg");
+    --cenario: url("../cenario_luta.jpg");
+    --img-time: url("../imagem_montetime.jpg");
+    --img-forcadex: url("../imagem_pokedex.jpg");
+    --img-loja: url("../imagem_lojinha.jpg");
+
+    --amarelo: #ffcb05;
+    --amarelo-escuro: #c99700;
+    --azul: #2a5db0;
+    --azul-escuro: #12285a;
 
     --cor-fundo-pagina: #0d1117;
     --cor-cabecalho: #000000;
@@ -47,24 +57,22 @@ body::before {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px 32px;
-    min-height: 110px;
-    padding: 16px 32px;
-    background: var(--cor-cabecalho);
+    gap: 10px 24px;
+    padding: 12px 28px;
+    background: var(--azul-escuro);
+    border-bottom: 3px solid var(--amarelo);
 }
 
 .cabecalho-logo {
     font-family: "Lilita One", "Arial Black", Impact, sans-serif;
-    font-size: 3.4rem;
+    font-size: 2.4rem;
     font-style: italic;
     line-height: 1;
     letter-spacing: -0.02em;
-    color: #ffcb05;
+    color: var(--amarelo);
     text-decoration: none;
-    -webkit-text-stroke: 0.14em #2a5db0;
+    -webkit-text-stroke: 0.14em var(--azul);
     paint-order: stroke fill;
-    filter: drop-shadow(0 0.05em 0 #12285a);
 }
 
 .logo-o {
@@ -76,52 +84,46 @@ body::before {
     background: var(--pokebola) center / contain no-repeat;
 }
 
-.cabecalho-menu,
-.cabecalho-usuario {
+.cabecalho-menu {
     display: flex;
     align-items: center;
-    gap: 36px;
-}
-
-.cabecalho-menu {
-    margin-left: auto;
-}
-
-.cabecalho-usuario {
-    font-size: 0.9rem;
-    color: var(--cor-texto-suave);
+    gap: 22px;
+    margin-left: 16px;
 }
 
 .menu-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--cor-texto);
+    color: #fff;
     text-decoration: none;
-    transition: color 0.2s;
 }
 
 .menu-link:hover,
 .menu-link.ativo {
-    color: var(--cor-dourado);
+    color: var(--amarelo);
 }
 
-
-.menu-link.com-seta::after {
-    content: "";
-    width: 5px;
-    height: 5px;
-    margin-top: -3px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: rotate(45deg);
+.cabecalho-usuario {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    font-size: 0.95rem;
 }
 
+.btn-sair {
+    padding: 6px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    background: #c4352d;
+    border-radius: 6px;
+}
 
+.btn-sair:hover {
+    background: #d9453d;
+}
 
 .conteudo {
     max-width: 1100px;
@@ -150,16 +152,20 @@ body::before {
 }
 
 .conteudo button {
-    padding: 12px 28px;
+    padding: 10px 24px;
+    font-family: inherit;
     font-size: 1rem;
     font-weight: 700;
-    font-family: inherit;
-    color: var(--cor-texto);
-    background: var(--cor-destaque);
+    color: var(--azul-escuro);
+    background: var(--amarelo);
     border: none;
-    border-bottom: 4px solid var(--cor-destaque-escura);
+    border-bottom: 4px solid var(--amarelo-escuro);
     border-radius: 8px;
     cursor: pointer;
+}
+
+.conteudo button:hover {
+    background: #ffd83a;
 }
 
 
@@ -315,4 +321,93 @@ body::before {
     display: block;
     text-align: center;
     color: var(--cor-dourado);
+}
+
+
+/* ===== Menu principal (site_jogo.php) ===== */
+
+.menu-jogo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.opcao {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 320px;
+    background-color: #222;
+    background-image:
+        linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0) 70%),
+        var(--img);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border: 3px solid #fff;
+    border-radius: 12px;
+}
+
+.opcao-texto {
+    padding: 20px 22px;
+}
+
+.opcao h2 {
+    margin: 0;
+    font-family: "Lilita One", "Arial Black", Impact, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: #fff;
+    text-shadow: 0 2px 4px #000;
+}
+
+.opcao p {
+    margin: 2px 0 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #fff;
+    text-shadow: 0 1px 3px #000, 0 0 8px #000;
+}
+
+.opcao-jogar {
+    grid-column: 1 / -1;
+    min-height: 400px;
+    --img: var(--cenario);
+}
+
+.opcao-jogar h2 {
+    font-size: 2.6rem;
+    color: var(--amarelo);
+}
+
+.opcao-time {
+    --img: var(--img-time);
+}
+
+.opcao-forcadex {
+    --img: var(--img-forcadex);
+}
+
+.opcao-loja {
+    --img: var(--img-loja);
+}
+
+@media (max-width: 800px) {
+    .menu-jogo {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho {
+        padding: 10px 16px;
+    }
+
+    .cabecalho-menu {
+        order: 3;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .opcao-jogar h2 {
+        font-size: 2.1rem;
+    }
 }

@@ -47,6 +47,10 @@
 
     .botoes-topo { margin-top: 15px; width: 100%; max-width: 680px; display: flex; justify-content: space-between; }
     .voltar-menu { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+  
+    /* Imagem de fundo da pagina e do cenario da luta */
+    body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: url("cenario_luta.jpg") center / cover no-repeat; filter: blur(6px) brightness(0.45); transform: scale(1.03); }
+    .cenario { background: url("cenario_luta.jpg") center 75% / cover no-repeat; }
   </style>
 </head>
 <body>
