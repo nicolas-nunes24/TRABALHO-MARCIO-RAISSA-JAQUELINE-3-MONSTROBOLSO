@@ -5,7 +5,7 @@
   // Se o cara confirmou o time, joga pra sessão e manda pra batalha
   if (isset($_POST['time_selecionado'])) {
       $_SESSION['meu_time'] = json_decode($_POST['time_selecionado'], true);
-      header("Location: jogo.php");
+        header("Location: jogo.php");
       exit;
   }
 

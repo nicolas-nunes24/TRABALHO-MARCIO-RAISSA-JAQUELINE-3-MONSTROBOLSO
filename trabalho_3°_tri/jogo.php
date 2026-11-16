@@ -1,14 +1,12 @@
 <?php
-  // Abre a sessão
-  session_start();
+session_start();
 
-  // Se o mano tentar entrar direto aqui sem escolher time, manda pro monte_time.php
- if (!isset($_SESSION['meu_time']) || empty($_SESSION['meu_time'])) {
-      header("Location: monte_time.php");
-      exit;
-  }
+if (empty($_SESSION['meu_time'])) {
+    header("Location: monte_time.php");
+    exit;
+}
 
-  $meuTime =$_SESSION['meu_time'];
+$meuTime = $_SESSION['meu_time'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -16,56 +14,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arena - MonstroBolso</title>
-  <style>
-    /* Estilo da tela de porrada */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-    body { background-color: #121417; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; justify-content: center; }
-
-    .arena-caixa { width: 100%; max-width: 680px; background-color: #2b3a26; border: 4px solid #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
-    .cenario { position: relative; height: 300px; background: linear-gradient(to bottom, #72c5ef 0%, #a4e0a2 60%, #59a657 100%); padding: 15px; }
-
-    .caixa-status { background-color: #f8f9fa; color: #111; border: 2px solid #333; padding: 10px; border-radius: 6px; width: 210px; position: absolute; font-size: 0.85rem; }
-    .status-inimigo { top: 15px; left: 15px; }
-    .status-jogador { bottom: 15px; right: 15px; }
-    .topo-status { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-weight: bold; }
-    .texto-hp { font-size: 0.75rem; color: #555; }
-
-    .fundo-barra { width: 100%; height: 8px; background-color: #cbd5e1; border-radius: 4px; overflow: hidden; border: 1px solid #94a3b8; }
-    .cheia-barra { height: 100%; width: 100%; background-color: #22c55e; transition: width 0.3s ease; }
-
-    .boneco { position: absolute; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; }
-    .boneco-inimigo { top: 30px; right: 50px; }
-    .boneco-jogador { bottom: 15px; left: 50px; }
-    .boneco img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
-
-    .painel-baixo { background-color: #1e293b; border-top: 4px solid #fff; display: flex; height: 130px; }
-    .caixa-texto { flex: 1; padding: 15px; font-size: 0.90rem; line-height: 1.4; border-right: 2px solid #334155; overflow-y: auto; }
-
-    .menu-botoes { width: 240px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; background-color: #0f172a; }
-    .botao-acao { background-color: #1e293b; color: #fff; border: 2px solid #334155; border-radius: 4px; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
-    .botao-acao:hover { background-color: #2563eb; border-color: #38bdf8; }
-
-    .botoes-topo { margin-top: 15px; width: 100%; max-width: 680px; display: flex; justify-content: space-between; }
-    .voltar-menu { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-  
-    /* Imagem de fundo da pagina e do cenario da luta */
-    body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: url("cenario_luta.jpg") center / cover no-repeat; filter: blur(6px) brightness(0.45); transform: scale(1.03); }
-    .cenario { background: url("cenario_luta.jpg") center 75% / cover no-repeat; }
-  </style>
+  <link rel="stylesheet" href="arenaJogo.css">
 </head>
 <body>
 
+  <div class="botoes-topo">
+    <button class="voltar-menu" onclick="irParaMontagem()">Mudar Time</button>
+    <button class="voltar-menu" onclick="window.location.href='site_jogo.php'">Menu Principal</button>
+  </div>
+
   <div class="arena-caixa">
     <div class="cenario">
-      
-      <!-- Status do Inimigo -->
+      <!-- Status e Sprite do Inimigo -->
       <div class="caixa-status status-inimigo">
         <div class="topo-status">
           <span id="nomeInimigo">Inimigo</span>
           <span class="texto-hp" id="hpInimigoTexto">100/100</span>
         </div>
         <div class="fundo-barra">
-          <div class="cheia-barra" id="barraInimigo" style="width: 100%;"></div>
+          <div class="cheia-barra" id="barraInimigo"></div>
         </div>
       </div>
 
@@ -73,7 +40,7 @@
         <img id="imgInimigo" src="" alt="Inimigo">
       </div>
 
-      <!-- Status do Jogador -->
+      <!-- Sprite e Status do Jogador -->
       <div class="boneco boneco-jogador">
         <img id="imgJogador" src="" alt="Jogador">
       </div>
@@ -84,17 +51,15 @@
           <span class="texto-hp" id="hpJogadorTexto">100/100</span>
         </div>
         <div class="fundo-barra">
-          <div class="cheia-barra" id="barraJogador" style="width: 100%;"></div>
+          <div class="cheia-barra" id="barraJogador"></div>
         </div>
       </div>
-
     </div>
 
     <!-- Controles de batalha -->
     <div class="painel-baixo">
       <div class="caixa-texto" id="falaDoJogo">A batalha vai começar!</div>
       
-      <!-- Menu de Ações com os 3 ataques dinâmicos -->
       <div class="menu-botoes">
         <button class="botao-acao" id="btnAtaque1">Investida</button>
         <button class="botao-acao" id="btnAtaque2">Elemental</button>
@@ -106,305 +71,269 @@
     </div>
   </div>
 
-  <div class="botoes-topo">
-    <button class="voltar-menu" onclick="irParaMontagem()">Mudar Time</button>
-    <button class="voltar-menu" onclick="window.location.href='site_jogo.php'">Menu Principal</button>
-  </div>
+  <script>
+  const $ = id => document.getElementById(id);
+  const falar = txt => $('falaDoJogo').innerText = txt;
+  const irParaMontagem = () => window.location.href = "monte_time.php";
+  const multEstagio = e => e >= 0 ? (2 + e) / 2 : 2 / (2 - e);
 
-</body>
+  const pokesDisponiveis = [
+    { nome: "Rubizard", tipo: "fogo", nivel: 50, hpMax: 80, ataque: 84, defesa: 78, fraquezas: ["agua", "smoke", "alcohol"], img: "imagens-personagens/rubizard.png" },
+    { nome: "Jynxtetoi", tipo: "ice", nivel: 50, hpMax: 95, ataque: 50, defesa: 35, fraquezas: ["fogo", "bug", "rock", "ghost", "dark", "steel", "dvd"], img: "imagens-personagens/jynxtetoi.png" },
+    { nome: "Meloetta", tipo: "normal", nivel: 50, hpMax: 100, ataque: 77, defesa: 77, fraquezas: ["bug", "dark"], img: "imagens-personagens/meloetta.png" },
+    { nome: "Nilldril", tipo: "bug", nivel: 50, hpMax: 65, ataque: 90, defesa: 40, fraquezas: ["fogo", "flying", "ground", "rock", "psiquico"], img: "imagens-personagens/nilldril.png" },
+    { nome: "Velostervroom", tipo: "steel", nivel: 50, hpMax: 80, ataque: 119, defesa: 90, fraquezas: ["fogo", "ground"], img: "imagens-personagens/velostervroom.png" },
+    { nome: "Vianalax", tipo: "normal", nivel: 50, hpMax: 160, ataque: 110, defesa: 65, fraquezas: ["luta", "buzz"], img: "imagens-personagens/vianalax.png" },
+    { nome: "Violetwo", tipo: "planta", nivel: 50, hpMax: 106, ataque: 110, defesa: 90, fraquezas: ["bug", "ghost", "dark"], img: "imagens-personagens/violetwo.png" },
+    { nome: "Brrpatana", tipo: "agua", nivel: 50, hpMax: 70, ataque: 52, defesa: 48, fraquezas: ["planta", "electric", "nico", "rd"], img: "imagens-personagens/brrpatana.png" },
+    { nome: "Darkvi", tipo: "dark", nivel: 50, hpMax: 70, ataque: 90, defesa: 90, fraquezas: ["luta", "bug", "fada", "ruivas", "donw"], img: "imagens-personagens/darkvi.png" },
+    { nome: "Dragofav", tipo: "dragao", nivel: 50, hpMax: 91, ataque: 134, defesa: 95, fraquezas: ["rock", "ice", "dragao", "fada", "jl"], img: "imagens-personagens/dragofav.png" }
+  ];
 
-<script>
-    // Pega o time vindo da sessão PHP
-    let meuTime = <?php echo json_encode($meuTime); ?>;
-    let vezDoBicho = 0;
+  const vantagens = {
+    fogo: { fogo: 0.5, agua: 0.5, planta: 2, normal: 1, ice: 2, bug: 2, steel: 2 },
+    agua: { fogo: 2, agua: 0.5, planta: 0.5, normal: 1, rock: 2, ground: 2 },
+    planta: { fogo: 0.5, agua: 2, planta: 0.5, normal: 1, rock: 2, ground: 2 },
+    normal: { fogo: 1, agua: 1, planta: 1, normal: 1 },
+    ice: { fogo: 0.5, agua: 0.5, planta: 2, dragao: 2, flying: 2, ground: 2 },
+    dark: { psiquico: 2, ghost: 2, dark: 0.5, luta: 0.5 },
+    bug: { planta: 2, psiquico: 2, dark: 2, fogo: 0.5 },
+    dragao: { dragao: 2, steel: 0.5 },
+    steel: { rock: 2, ice: 2, fada: 2, steel: 0.5, fogo: 0.5, agua: 0.5 }
+  };
 
-    // Catálogo completo com os Pokémon das imagens
-    const pokesDisponiveis = [
-      { nome: "Rubizard", tipo: "fogo", nivel: 50, hpMax: 80, hpAtual: 80, ataque: 84, defesa: 78, fraquezas: ["agua", "smoke", "alcohol"], img: "imagens-personagens/rubizard.png" },
-      { nome: "Jynxtetoi", tipo: "ice", nivel: 50, hpMax: 95, hpAtual: 95, ataque: 50, defesa: 35, fraquezas: ["fogo", "bug", "rock", "ghost", "dark", "steel", "dvd"], img: "imagens-personagens/jynxtetoi.png" },
-      { nome: "Meloetta", tipo: "normal", nivel: 50, hpMax: 100, hpAtual: 100, ataque: 77, defesa: 77, fraquezas: ["bug", "dark"], img: "imagens-personagens/meloetta.png" },
-      { nome: "Nilldril", tipo: "bug", nivel: 50, hpMax: 65, hpAtual: 65, ataque: 90, defesa: 40, fraquezas: ["fogo", "flying", "ground", "rock", "psiquico"], img: "imagens-personagens/nilldril.png" },
-      { nome: "Velostervroom", tipo: "steel", nivel: 50, hpMax: 80, hpAtual: 80, ataque: 119, defesa: 90, fraquezas: ["fogo", "ground"], img: "imagens-personagens/velostervroom.png" },
-      { nome: "Vianalax", tipo: "normal", nivel: 50, hpMax: 160, hpAtual: 160, ataque: 110, defesa: 65, fraquezas: ["luta", "buzz"], img: "imagens-personagens/vianalax.png" },
-      { nome: "Violetwo", tipo: "planta", nivel: 50, hpMax: 106, hpAtual: 106, ataque: 110, defesa: 90, fraquezas: ["bug", "ghost", "dark"], img: "imagens-personagens/violetwo.png" },
-      { nome: "Brrpatana", tipo: "agua", nivel: 50, hpMax: 70, hpAtual: 70, ataque: 52, defesa: 48, fraquezas: ["planta", "electric", "nico", "rd"], img: "imagens-personagens/brrpatana.png" },
-      { nome: "Darkvi", tipo: "dark", nivel: 50, hpMax: 70, hpAtual: 70, ataque: 90, defesa: 90, fraquezas: ["luta", "bug", "fada", "ruivas", "donw"], img: "imagens-personagens/darkvi.png" },
-      { nome: "Dragofav", tipo: "dragao", nivel: 50, hpMax: 91, hpAtual: 91, ataque: 134, defesa: 95, fraquezas: ["rock", "ice", "dragao", "fada", "jl"], img: "imagens-personagens/dragofav.png" }
-    ];
+  // 1. Cada golpe agora possui a propriedade 'pp'
+  const bibliotecaGolpes = {
+    fogo:   { elemental: { nome: "Lança-Chamas", poder: 90, precisao: 100, tipo: "fogo", pp: 15 }, debuff: { nome: "Fumaça Densa", poder: 0, precisao: 100, tipo: "fogo", efeito: "ata", pp: 20 } },
+    agua:   { elemental: { nome: "Hidro Bomba", poder: 90, precisao: 85, tipo: "agua", pp: 10 }, debuff: { nome: "Jacto Enfraquecedor", poder: 40, precisao: 100, tipo: "agua", efeito: "ata", pp: 20 } },
+    planta: { elemental: { nome: "Chicote de Vinha", poder: 80, precisao: 100, tipo: "planta", pp: 15 }, debuff: { nome: "Pó de Esporos", poder: 0, precisao: 90, tipo: "planta", efeito: "def", pp: 20 } },
+    normal: { elemental: { nome: "Golpe de Corpo", poder: 85, precisao: 100, tipo: "normal", pp: 15 }, debuff: { nome: "Encarar", poder: 0, precisao: 100, tipo: "normal", efeito: "def", pp: 20 } },
+    ice:    { elemental: { nome: "Raio de Gelo", poder: 90, precisao: 100, tipo: "ice", pp: 15 }, debuff: { nome: "Vento Gelado", poder: 35, precisao: 95, tipo: "ice", efeito: "ata", pp: 20 } },
+    dark:   { elemental: { nome: "Pulso Sombrio", poder: 80, precisao: 100, tipo: "dark", pp: 15 }, debuff: { nome: "Provocar", poder: 0, precisao: 100, tipo: "dark", efeito: "def", pp: 20 } },
+    bug:    { elemental: { nome: "Zumbido", poder: 90, precisao: 100, tipo: "bug", pp: 15 }, debuff: { nome: "Fio de Teia", poder: 0, precisao: 95, tipo: "bug", efeito: "def", pp: 20 } },
+    dragao: { elemental: { nome: "Garra Dragão", poder: 80, precisao: 100, tipo: "dragao", pp: 15 }, debuff: { nome: "Rugido Assustador", poder: 0, precisao: 100, tipo: "dragao", efeito: "ata", pp: 20 } },
+    steel:  { elemental: { nome: "Cabeçada de Aço", poder: 80, precisao: 100, tipo: "steel", pp: 15 }, debuff: { nome: "Som Metálico", poder: 0, precisao: 100, tipo: "steel", efeito: "def", pp: 20 } }
+  };
 
-    let timeInimigo = [];
-    let vezDoInimigo = 0;
-    let travado = false;
+  const golpeInvestida = { nome: "Investida", poder: 40, precisao: 100, tipo: "normal", pp: 35 };
+  const golpeCombate = { nome: "Combate", poder: 50, precisao: 100, tipo: "normal", infinito: true };
 
-    // Tabela padrão de tipos
-    const vantagens = {
-      'fogo': { 'fogo': 0.5, 'agua': 0.5, 'planta': 2.0, 'normal': 1.0, 'ice': 2.0, 'bug': 2.0, 'steel': 2.0 },
-      'agua': { 'fogo': 2.0, 'agua': 0.5, 'planta': 0.5, 'normal': 1.0, 'rock': 2.0, 'ground': 2.0 },
-      'planta': { 'fogo': 0.5, 'agua': 2.0, 'planta': 0.5, 'normal': 1.0, 'rock': 2.0, 'ground': 2.0 },
-      'normal': { 'fogo': 1.0, 'agua': 1.0, 'planta': 1.0, 'normal': 1.0 },
-      'ice': { 'fogo': 0.5, 'agua': 0.5, 'planta': 2.0, 'dragao': 2.0, 'flying': 2.0, 'ground': 2.0 },
-      'dark': { 'psiquico': 2.0, 'ghost': 2.0, 'dark': 0.5, 'luta': 0.5 },
-      'bug': { 'planta': 2.0, 'psiquico': 2.0, 'dark': 2.0, 'fogo': 0.5 },
-      'dragao': { 'dragao': 2.0, 'steel': 0.5 },
-      'steel': { 'rock': 2.0, 'ice': 2.0, 'fada': 2.0, 'steel': 0.5, 'fogo': 0.5, 'agua': 0.5 }
+  // 2. Clona os 3 golpes individualmente para cada Pokémon com ppAtual e ppMax
+  const normalizarPoke = p => {
+    const tipo = p.tipo || "normal";
+    const set = bibliotecaGolpes[tipo] || bibliotecaGolpes.normal;
+    const golpes = p.golpes || [golpeInvestida, set.elemental, set.debuff].map(g => ({
+      ...g,
+      ppMax: g.pp,
+      ppAtual: g.pp
+    }));
+
+    return {
+      ...p,
+      nivel: p.nivel || 50,
+      tipo,
+      ataque: p.ataque || p.forca || 50,
+      defesa: p.defesa || 50,
+      hpMax: p.hpMax || 100,
+      hp: p.hp ?? p.hpAtual ?? p.hpMax ?? 100,
+      fraquezas: p.fraquezas || [],
+      estagios: p.estagios || { ata: 0, def: 0 },
+      golpes
     };
+  };
 
-    // Golpes base
-    const bibliotecaGolpes = {
-      fogo: { elemental: { nome: "Lança-Chamas", poder: 90, precisao: 100, tipo: "fogo" }, debuff: { nome: "Fumaça Densa", poder: 0, precisao: 100, tipo: "fogo", efeito: "redutAtaque" } },
-      agua: { elemental: { nome: "Hidro Bomba", poder: 90, precisao: 85, tipo: "agua" }, debuff: { nome: "Jacto Enfraquecedor", poder: 40, precisao: 100, tipo: "agua", efeito: "redutAtaque" } },
-      planta: { elemental: { nome: "Chicote de Vinha", poder: 80, precisao: 100, tipo: "planta" }, debuff: { nome: "Pó de Esporos", poder: 0, precisao: 90, tipo: "planta", efeito: "redutDefesa" } },
-      normal: { elemental: { nome: "Golpe de Corpo", poder: 85, precisao: 100, tipo: "normal" }, debuff: { nome: "Encarar", poder: 0, precisao: 100, tipo: "normal", efeito: "redutDefesa" } },
-      ice: { elemental: { nome: "Raio de Gelo", poder: 90, precisao: 100, tipo: "ice" }, debuff: { nome: "Vento Gelado", poder: 35, precisao: 95, tipo: "ice", efeito: "redutAtaque" } },
-      dark: { elemental: { nome: "Pulso Sombrio", poder: 80, precisao: 100, tipo: "dark" }, debuff: { nome: "Provocar", poder: 0, precisao: 100, tipo: "dark", efeito: "redutDefesa" } },
-      bug: { elemental: { nome: "Zumbido", poder: 90, precisao: 100, tipo: "bug" }, debuff: { nome: "Fio de Teia", poder: 0, precisao: 95, tipo: "bug", efeito: "redutDefesa" } },
-      dragao: { elemental: { nome: "Garra Dragão", poder: 80, precisao: 100, tipo: "dragao" }, debuff: { nome: "Rugido Assustador", poder: 0, precisao: 100, tipo: "dragao", efeito: "redutAtaque" } },
-      steel: { elemental: { nome: "Cabeçada de Aço", poder: 80, precisao: 100, tipo: "steel" }, debuff: { nome: "Som Metálico", poder: 0, precisao: 100, tipo: "steel", efeito: "redutDefesa" } }
-    };
+  let meuTime = (<?php echo json_encode($meuTime); ?>).map(normalizarPoke);
+  let timeInimigo = [...pokesDisponiveis].sort(() => Math.random() - 0.5).slice(0, 3).map(normalizarPoke);
+  let vezDoBicho = 0;
+  let vezDoInimigo = 0;
+  let travado = false;
 
-    const golpeInvestidaPadrao = { nome: "Investida", poder: 40, precisao: 100, tipo: "normal" };
+  function atualizarBarraHP(idBarra, idTexto, hp, hpMax) {
+    const porc = Math.max(0, (hp / hpMax) * 100);
+    const barra = $(idBarra);
+    barra.style.width = porc + '%';
+    barra.style.backgroundColor = porc > 50 ? '#22c55e' : porc > 20 ? '#eab308' : '#ef4444';
+    $(idTexto).innerText = `${Math.ceil(hp)}/${hpMax}`;
+  }
 
-    function gerarTimeInimigo() {
-      let time = [];
-      let copiaDisponiveis = [...pokesDisponiveis];
-      for (let i = 0; i < 3; i++) {
-        let idx = Math.floor(Math.random() * copiaDisponiveis.length);
-        let pokeClonado = JSON.parse(JSON.stringify(copiaDisponiveis[idx]));
-        pokeClonado.estagios = { ata: 0, def: 0 };
-        time.push(pokeClonado);
-        copiaDisponiveis.splice(idx, 1); // Evita Pokémon repetidos no mesmo time
-      }
-      return time;
-    }
+  // 3. Atualiza os botões com o contador de PP e bloqueia os que chegaram a 0
+  function atualizarArena() {
+    const bicho = meuTime[vezDoBicho];
+    const op = timeInimigo[vezDoInimigo];
 
-    function getMultiplicadorEstagio(estagio) {
-      if (estagio >= 0) return (2 + estagio) / 2;
-      return 2 / (2 - estagio);
-    }
+    $('nomeJogador').innerText = bicho.nome;
+    $('imgJogador').src = bicho.img;
+    atualizarBarraHP('barraJogador', 'hpJogadorTexto', bicho.hp, bicho.hpMax);
 
-    function oponenteAtual() {
-      return timeInimigo[vezDoInimigo];
-    }
+    $('nomeInimigo').innerText = `${op.nome} (${vezDoInimigo + 1}/3)`;
+    $('imgInimigo').src = op.img;
+    atualizarBarraHP('barraInimigo', 'hpInimigoTexto', op.hp, op.hpMax);
 
-    function iniciarBatalha() {
-      if (timeInimigo.length === 0) {
-        timeInimigo = gerarTimeInimigo();
-        vezDoInimigo = 0;
-      }
+    const botoes = [$('btnAtaque1'), $('btnAtaque2'), $('btnAtaque3')];
+    const semPP = bicho.golpes.every(g => g.ppAtual <= 0);
 
-      let bicho = meuTime[vezDoBicho];
-      let op = oponenteAtual();
+    if (semPP) {
+      botoes[0].innerText = "Combate (Sem PP)";
+      botoes[0].disabled = false;
+      botoes[0].onclick = () => executarTurno(golpeCombate);
 
-      bicho.nivel = bicho.nivel || 50;
-      bicho.tipo = bicho.tipo || 'normal';
-      bicho.ataque = bicho.ataque || bicho.forca || 50;
-      bicho.defesa = bicho.defesa || 50;
-      bicho.hpMax = bicho.hpMax || 100;
-      bicho.hp = (bicho.hp !== undefined) ? bicho.hp : bicho.hpMax;
-      bicho.estagios = bicho.estagios || { ata: 0, def: 0 };
-      bicho.fraquezas = bicho.fraquezas || [];
-
-      document.getElementById('nomeJogador').innerText = bicho.nome;
-      document.getElementById('imgJogador').src = bicho.img;
-      atualizarBarraHP('barraJogador', 'hpJogadorTexto', bicho.hp, bicho.hpMax);
-
-      atualizarInterfaceInimigo();
-      atualizarBotoesAtaque();
-      falar(`Batalha iniciada! O oponente enviou ${op.nome}! Vai, ${bicho.nome}!`);
-    }
-
-    function atualizarInterfaceInimigo() {
-      let op = oponenteAtual();
-      document.getElementById('nomeInimigo').innerText = `${op.nome} (${vezDoInimigo + 1}/3)`;
-      document.getElementById('imgInimigo').src = op.img;
-      atualizarBarraHP('barraInimigo', 'hpInimigoTexto', op.hpAtual, op.hpMax);
-    }
-
-    function atualizarBarraHP(idBarra, idTexto, hpAtual, hpMax) {
-      let porc = Math.max(0, (hpAtual / hpMax) * 100);
-      document.getElementById(idBarra).style.width = porc + '%';
-      document.getElementById(idTexto).innerText = `${Math.ceil(hpAtual)}/${hpMax}`;
-    }
-
-    function atualizarBotoesAtaque() {
-      let bicho = meuTime[vezDoBicho];
-      let tipo = bicho.tipo in bibliotecaGolpes ? bicho.tipo : 'normal';
-      let golpes = bibliotecaGolpes[tipo];
-
-      let btn1 = document.getElementById('btnAtaque1');
-      let btn2 = document.getElementById('btnAtaque2');
-      let btn3 = document.getElementById('btnAtaque3');
-
-      if (btn1) {
-        btn1.innerText = `${golpeInvestidaPadrao.nome} (Físico)`;
-        btn1.onclick = () => executarTurnoShowdown(golpeInvestidaPadrao);
-      }
-      if (btn2) {
-        btn2.innerText = `${golpes.elemental.nome} (${tipo.toUpperCase()})`;
-        btn2.onclick = () => executarTurnoShowdown(golpes.elemental);
-      }
-      if (btn3) {
-        btn3.innerText = `${golpes.debuff.nome} (Status)`;
-        btn3.onclick = () => executarTurnoShowdown(golpes.debuff);
-      }
-    }
-
-    // Calculadora com suporte a fraquezas personalizadas dos cartões
-    function calcularDanoShowdown(atacante, defensor, golpe) {
-      if (golpe.poder === 0) return { dano: 0, efec: 1, critico: false, errou: false };
-
-      if (Math.random() * 100 > golpe.precisao) {
-        return { dano: 0, efec: 1, critico: false, errou: true };
-      }
-
-      let atqReal = atacante.ataque * getMultiplicadorEstagio(atacante.estagios.ata);
-      let defReal = defensor.defesa * getMultiplicadorEstagio(defensor.estagios.def);
-      let danoBase = Math.floor(Math.floor((2 * atacante.nivel / 5 + 2) * golpe.poder * (atqReal / defReal)) / 50) + 2;
-
-      let critico = Math.random() < 0.0625;
-      let multCritico = critico ? 1.5 : 1.0;
-      let rng = (Math.floor(Math.random() * 16) + 85) / 100;
-      let stab = (atacante.tipo === golpe.tipo) ? 1.5 : 1.0;
-
-      // Verifica fraqueza da lista do cartão do defensor ou da tabela de tipos
-      let efec = 1.0;
-      if (defensor.fraquezas && defensor.fraquezas.includes(golpe.tipo.toLowerCase())) {
-        efec = 2.0;
-      } else {
-        efec = vantagens[golpe.tipo]?.[defensor.tipo] ?? 1.0;
-      }
-
-      let danoFinal = Math.floor(danoBase * multCritico * rng * stab * efec);
-      return { dano: Math.max(1, danoFinal), efec: efec, critico: critico, errou: false };
-    }
-
-    function executarTurnoShowdown(golpeEscolhido) {
-      let bichoAtual = meuTime[vezDoBicho];
-      let op = oponenteAtual();
-
-      if (travado || bichoAtual.hp <= 0 || op.hpAtual <= 0) return;
-      travado = true;
-
-      let resultado = calcularDanoShowdown(bichoAtual, op, golpeEscolhido);
-      let log = "";
-
-      if (resultado.errou) {
-        log = `${bichoAtual.nome} usou ${golpeEscolhido.nome}, mas errou!`;
-      } else {
-        op.hpAtual -= resultado.dano;
-        if (op.hpAtual < 0) op.hpAtual = 0;
-        atualizarBarraHP('barraInimigo', 'hpInimigoTexto', op.hpAtual, op.hpMax);
-
-        log = `${bichoAtual.nome} usou ${golpeEscolhido.nome}! `;
-        if (resultado.dano > 0) log += `Causou ${resultado.dano} de dano. `;
-
-        if (golpeEscolhido.efeito === 'redutAtaque' && op.estagios.ata > -6) {
-          op.estagios.ata--;
-          log += ` O Ataque de ${op.nome} caiu!`;
-        } else if (golpeEscolhido.efeito === 'redutDefesa' && op.estagios.def > -6) {
-          op.estagios.def--;
-          log += ` A Defesa de ${op.nome} caiu!`;
-        }
-
-        if (resultado.critico) log += " Um golpe crítico!";
-        if (resultado.efec > 1) log += " É super efetivo!";
-        else if (resultado.efec < 1 && resultado.efec > 0) log += " Não é muito efetivo...";
-      }
-
-      falar(log);
-
-      if (op.hpAtual === 0) {
-        setTimeout(() => {
-          let proximoInimigoVivo = timeInimigo.findIndex(b => b.hpAtual > 0);
-          if (proximoInimigoVivo !== -1) {
-            vezDoInimigo = proximoInimigoVivo;
-            let novoOp = oponenteAtual();
-            atualizarInterfaceInimigo();
-            falar(`${op.nome} desmaiou! O oponente enviou ${novoOp.nome}!`);
-            travado = false;
-          } else {
-            alert("Vitória esplêndida! Você derrotou todo o time oponente!");
-            irParaMontagem();
-          }
-        }, 1300);
-        return;
-      }
-
-      setTimeout(() => { vezDoBotShowdown(); }, 1600);
-    }
-
-    function vezDoBotShowdown() {
-      let bichoAtual = meuTime[vezDoBicho];
-      let op = oponenteAtual();
-
-      if (bichoAtual.hp <= 0 || op.hpAtual <= 0) return;
-
-      let tipoOp = op.tipo in bibliotecaGolpes ? op.tipo : 'normal';
-      let golpeBot = Math.random() > 0.4 ? bibliotecaGolpes[tipoOp].elemental : golpeInvestidaPadrao;
-
-      let resultado = calcularDanoShowdown(op, bichoAtual, golpeBot);
-      let log = "";
-
-      if (resultado.errou) {
-        log = `${op.nome} tentou usar ${golpeBot.nome}, mas errou!`;
-      } else {
-        bichoAtual.hp -= resultado.dano;
-        if (bichoAtual.hp < 0) bichoAtual.hp = 0;
-        atualizarBarraHP('barraJogador', 'hpJogadorTexto', bichoAtual.hp, bichoAtual.hpMax);
-
-        log = `${op.nome} usou ${golpeBot.nome} e causou ${resultado.dano} de dano!`;
-        if (resultado.critico) log += " Foi um golpe crítico!";
-        if (resultado.efec > 1) log += " Foi super efetivo!";
-      }
-
-      falar(log);
-
-      if (bichoAtual.hp === 0) {
-        setTimeout(() => {
-          alert(`${bichoAtual.nome} desmaiou!`);
-          let proximoVivo = meuTime.findIndex(b => b.hp > 0);
-          if (proximoVivo !== -1) {
-            vezDoBicho = proximoVivo;
-            iniciarBatalha();
-            travado = false;
-          } else {
-            alert("Você não tem mais Pokémon disponíveis! Fim de jogo.");
-            irParaMontagem();
-          }
-        }, 1200);
-        return;
-      }
-
-      setTimeout(() => { falar("Sua vez de jogar!"); travado = false; }, 1500);
-    }
-
-    function abrirTroca() {
-      let opcoes = "Escolha um Pokémon do time para entrar:\n";
-      meuTime.forEach((b, i) => {
-        if (i !== vezDoBicho && b.hp > 0) opcoes += `[${i + 1}] ${b.nome} (HP: ${Math.ceil(b.hp)}/${b.hpMax || 100})\n`;
+      botoes.slice(1).forEach(btn => {
+        btn.innerText = "--- [0/0]";
+        btn.disabled = true;
       });
-      let escolha = prompt(opcoes);
-      let novoIndice = parseInt(escolha) - 1;
-      if (!isNaN(novoIndice) && meuTime[novoIndice] && novoIndice !== vezDoBicho && meuTime[novoIndice].hp > 0) {
-        vezDoBicho = novoIndice;
-        iniciarBatalha();
-        falar(`Vai! ${meuTime[vezDoBicho].nome}!`);
-      } else {
-        falar("Escolha inválida!");
-      }
+      return;
     }
 
-    function falar(texto) {
-      document.getElementById('falaDoJogo').innerText = texto;
+    bicho.golpes.forEach((golpe, i) => {
+      const btn = botoes[i];
+      btn.innerText = `${golpe.nome} [${golpe.ppAtual}/${golpe.ppMax}]`;
+      btn.disabled = golpe.ppAtual <= 0;
+      btn.onclick = () => executarTurno(golpe);
+    });
+  }
+
+  function calcularDano(atacante, defensor, golpe) {
+    if (Math.random() * 100 > golpe.precisao) return { errou: true };
+    if (golpe.poder === 0) return { dano: 0, efec: 1, critico: false };
+
+    const atq = atacante.ataque * multEstagio(atacante.estagios.ata);
+    const def = defensor.defesa * multEstagio(defensor.estagios.def);
+    const base = Math.floor(Math.floor((2 * atacante.nivel / 5 + 2) * golpe.poder * (atq / def)) / 50) + 2;
+
+    const critico = Math.random() < 0.0625;
+    const rng = (Math.floor(Math.random() * 16) + 85) / 100;
+    const stab = atacante.tipo === golpe.tipo ? 1.5 : 1;
+    const efec = defensor.fraquezas.includes(golpe.tipo.toLowerCase())
+      ? 2
+      : (vantagens[golpe.tipo]?.[defensor.tipo] ?? 1);
+
+    const dano = Math.max(1, Math.floor(base * (critico ? 1.5 : 1) * rng * stab * efec));
+    return { dano, efec, critico };
+  }
+
+  // 4. Consome 1 PP ao usar o golpe e atualiza o texto do botão
+  function aplicarGolpe(atacante, defensor, golpe, alvoEhInimigo) {
+    if (!golpe.infinito && golpe.ppAtual > 0) {
+      golpe.ppAtual--;
+      atualizarArena();
     }
 
-    function irParaMontagem() {
-      window.location.href = "monte_time.php";
+    const res = calcularDano(atacante, defensor, golpe);
+    if (res.errou) {
+      falar(`${atacante.nome} usou ${golpe.nome}, mas errou!`);
+      return;
     }
 
-    window.onload = function() {
-      iniciarBatalha();
-    };
+    defensor.hp = Math.max(0, defensor.hp - res.dano);
+    atualizarBarraHP(
+      alvoEhInimigo ? 'barraInimigo' : 'barraJogador',
+      alvoEhInimigo ? 'hpInimigoTexto' : 'hpJogadorTexto',
+      defensor.hp,
+      defensor.hpMax
+    );
+
+    let log = `${atacante.nome} usou ${golpe.nome}!`;
+    if (res.dano > 0) log += ` Causou ${res.dano} de dano.`;
+    if (golpe.efeito && defensor.estagios[golpe.efeito] > -6) {
+      defensor.estagios[golpe.efeito]--;
+      log += ` ${golpe.efeito === 'ata' ? 'O Ataque' : 'A Defesa'} de ${defensor.nome} caiu!`;
+    }
+    if (res.critico) log += " Golpe crítico!";
+    if (res.efec > 1) log += " É super efetivo!";
+    else if (res.efec < 1) log += " Não é muito efetivo...";
+
+    falar(log);
+  }
+
+  function executarTurno(golpeJogador) {
+    const bicho = meuTime[vezDoBicho];
+    const op = timeInimigo[vezDoInimigo];
+    if (travado || bicho.hp <= 0 || op.hp <= 0) return;
+    if (!golpeJogador.infinito && golpeJogador.ppAtual <= 0) return;
+
+    travado = true;
+    aplicarGolpe(bicho, op, golpeJogador, true);
+
+    if (op.hp === 0) {
+      setTimeout(() => {
+        const prox = timeInimigo.findIndex(b => b.hp > 0);
+        if (prox !== -1) {
+          vezDoInimigo = prox;
+          atualizarArena();
+          falar(`${op.nome} desmaiou! O oponente enviou ${timeInimigo[prox].nome}!`);
+          travado = false;
+        } else {
+          alert("Vitória esplêndida! Você derrotou todo o time oponente!");
+          irParaMontagem();
+        }
+      }, 1300);
+      return;
+    }
+
+    setTimeout(turnoBot, 1500);
+  }
+
+  function turnoBot() {
+    const bicho = meuTime[vezDoBicho];
+    const op = timeInimigo[vezDoInimigo];
+    if (bicho.hp <= 0 || op.hp <= 0) return;
+
+    // Bot também respeita os próprios PPs disponíveis
+    const disponiveis = op.golpes.filter(g => g.ppAtual > 0);
+    const golpeBot = disponiveis.length
+      ? disponiveis[Math.floor(Math.random() * disponiveis.length)]
+      : golpeCombate;
+
+    aplicarGolpe(op, bicho, golpeBot, false);
+
+    if (bicho.hp === 0) {
+      setTimeout(() => {
+        alert(`${bicho.nome} desmaiou!`);
+        const prox = meuTime.findIndex(b => b.hp > 0);
+        if (prox !== -1) {
+          vezDoBicho = prox;
+          atualizarArena();
+          falar(`Vai, ${meuTime[prox].nome}!`);
+          travado = false;
+        } else {
+          alert("Você não tem mais Pokémon disponíveis! Fim de jogo.");
+          irParaMontagem();
+        }
+      }, 1200);
+      return;
+    }
+
+    setTimeout(() => {
+      falar("Sua vez de jogar!");
+      travado = false;
+    }, 1400);
+  }
+
+  function abrirTroca() {
+    if (travado) return;
+
+    const opcoes = meuTime
+      .map((b, i) => (i !== vezDoBicho && b.hp > 0) ? `[${i + 1}] ${b.nome} (HP: ${Math.ceil(b.hp)}/${b.hpMax})` : null)
+      .filter(Boolean);
+
+    if (!opcoes.length) return falar("Nenhum outro Pokémon disponível para troca!");
+
+    const idx = parseInt(prompt("Escolha um Pokémon para entrar:\n" + opcoes.join("\n"))) - 1;
+    if (!meuTime[idx] || idx === vezDoBicho || meuTime[idx].hp <= 0) {
+      return falar("Escolha inválida!");
+    }
+
+    travado = true;
+    vezDoBicho = idx;
+    atualizarArena();
+    falar(`Vai, ${meuTime[vezDoBicho].nome}!`);
+    setTimeout(turnoBot, 1400);
+  }
+
+  window.onload = () => {
+    atualizarArena();
+    falar(`Batalha iniciada! O oponente enviou ${timeInimigo[0].nome}! Vai, ${meuTime[0].nome}!`);
+  };
 </script>
 </body>
 </html>
