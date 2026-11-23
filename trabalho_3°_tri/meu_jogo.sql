@@ -32,9 +32,6 @@ CREATE TABLE Loja(
 );
 
 
-USE meu_jogo;
-
-
 ALTER TABLE Loja
   ADD COLUMN nomeItem   varchar(40) NOT NULL DEFAULT '' AFTER id_item,
   ADD COLUMN valorEfeito int NULL,          -- HP recuperado (NULL = 100%)
