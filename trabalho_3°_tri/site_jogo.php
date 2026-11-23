@@ -25,7 +25,7 @@ if (empty($_SESSION['usuario_id'])) {
     <nav class="cabecalho-menu">
         <a class="menu-link" href="jogo.php">Jogar</a>
         <a class="menu-link" href="monte_time.php">Time</a>
-        <a class="menu-link" href="aba-personagens.html">Forçadex</a>
+        <a class="menu-link" href="forcadex.php">Forçadex</a>
         <a class="menu-link" href="src/MVC/View/Usuario/index.php?acao=dashboard">Loja</a>
     </nav>
 
@@ -82,7 +82,7 @@ function TrocaTela(){
 }
 
 function abrirForcadex(){
-    window.location.href = "aba-personagens.html";
+    window.location.href = "forcadex.php";
 }
 
 function telaLojinha(){
