@@ -4,6 +4,8 @@
   // salva o time escolhido e manda pra batalha
   if (isset($_POST['time_selecionado'])) {
       $_SESSION['meu_time'] = json_decode($_POST['time_selecionado'], true);
+      $nomes = implode(', ', array_column($_SESSION['meu_time'], 'nome'));
+      registrarLog('time', "Montou o time: [{$nomes}].");
       header("Location: jogo.php");
       exit;
   }

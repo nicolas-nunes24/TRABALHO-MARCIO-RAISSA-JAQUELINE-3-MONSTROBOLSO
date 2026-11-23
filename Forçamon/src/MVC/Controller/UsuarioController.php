@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../Model/Usuario.php";
 require_once __DIR__ . "/../../../config/config.php";
+require_once __DIR__ . "/../../../log/registrar_log.php";
 
 class UsuarioController {
 
@@ -47,6 +48,7 @@ class UsuarioController {
 
     public function registrar() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            registrarLog('registro', "Tentativa de cadastro falhou: requisição inválida.", 'Desconhecido');
             $this->redirecionarComErro('cadastro', 'Requisição inválida.');
         }
 
@@ -55,6 +57,7 @@ class UsuarioController {
         $senha = $_POST['senha'] ?? '';
 
         if (!$nome || !$email || !$senha) {
+            registrarLog('registro', "Tentativa de cadastro falhou: campos obrigatórios em branco (E-mail: {$email}).", $nome ?: 'Desconhecido');
             $this->redirecionarComErro('cadastro', 'Preencha todos os campos.');
         }
 
@@ -67,18 +70,23 @@ class UsuarioController {
                 $st->execute([':u' => $usuario->getId(), ':n' => $nome]);
 
                 $_SESSION['flash_success'] = 'Conta criada com sucesso!';
+                registrarLog('registro', "Novo usuário cadastrado: {$email}", $nome);
+
                 header("Location: ?acao=login");
                 exit;
             }
 
+            registrarLog('registro', "Tentativa de cadastro falhou para {$email}: erro ao salvar os dados.", $nome);
             $this->redirecionarComErro('cadastro', 'Erro ao salvar os dados.');
         } catch (Exception $e) {
+            registrarLog('registro', "Tentativa de cadastro falhou para {$email}: " . $e->getMessage(), $nome);
             $this->redirecionarComErro('cadastro', $e->getMessage());
         }
     }
 
     public function fazerLogin() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            registrarLog('login', "Tentativa de login falhou: requisição inválida.", 'Desconhecido');
             $this->redirecionarComErro('login', 'Requisição inválida.');
         }
 
@@ -86,6 +94,7 @@ class UsuarioController {
         $senha = $_POST['senha'] ?? '';
 
         if (!$email || !$senha) {
+            registrarLog('login', "Tentativa de login falhou: campos em branco.", 'Desconhecido');
             $this->redirecionarComErro('login', 'Informe seu e-mail e senha.');
         }
 
@@ -101,12 +110,16 @@ class UsuarioController {
                 $_SESSION['usuario_id'] = $user->getId();
                 $this->garantirPerfilAtivo((int)$user->getId(), $user->getNome());
 
+                registrarLog('login', "Login realizado com sucesso.", $user->getNome());
+
                 header("Location: ../../../../site_jogo.php");
                 exit;
             }
 
+            registrarLog('login', "Tentativa de login falhou para: {$email}", 'Desconhecido');
             $this->redirecionarComErro('login', 'E-mail ou senha incorretos.');
         } catch (Exception $e) {
+            registrarLog('login', "Erro técnico no login para {$email}: " . $e->getMessage(), 'Desconhecido');
             $this->redirecionarComErro('login', 'Erro no login: ' . $e->getMessage());
         }
     }

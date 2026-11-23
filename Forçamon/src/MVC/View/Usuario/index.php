@@ -1,4 +1,6 @@
 <?php
+require_once '../../../../log/registrar_log.php';
+
 require_once __DIR__ . "/../../../../config/autoload.php";
 
 
@@ -11,3 +13,6 @@ if (method_exists($controller, $acao)) {
 } else {
     die("Ação '{$acao}' não encontrada.");
 }
+
+
+

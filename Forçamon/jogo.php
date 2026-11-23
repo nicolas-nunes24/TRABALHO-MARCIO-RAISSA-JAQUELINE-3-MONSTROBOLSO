@@ -84,6 +84,15 @@ $meuTime = $_SESSION['meu_time'];
   </div>
 
   <script>
+    
+    const enviarLog = (categoria, mensagem) => {
+  fetch('api_log.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ categoria, mensagem })
+  });
+};
+
   const $ = id => document.getElementById(id);
   const falar = txt => $('falaDoJogo').innerText = txt;
   const irParaMontagem = () => window.location.href = "monte_time.php";
