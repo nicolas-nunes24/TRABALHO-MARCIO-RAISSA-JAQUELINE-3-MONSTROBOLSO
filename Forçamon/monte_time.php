@@ -1,6 +1,7 @@
 <?php
+  require_once __DIR__ . "/log/registrar_log.php";
   session_start();
-
+  
   // salva o time escolhido e manda pra batalha
   if (isset($_POST['time_selecionado'])) {
       $_SESSION['meu_time'] = json_decode($_POST['time_selecionado'], true);

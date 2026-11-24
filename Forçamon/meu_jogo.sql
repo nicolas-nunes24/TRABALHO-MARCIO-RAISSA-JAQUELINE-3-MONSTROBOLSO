@@ -21,18 +21,18 @@ CREATE TABLE Perfil (
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
 );
 
-CREATE TABLE Pokemon (
-    id_Pokemon INT AUTO_INCREMENT PRIMARY KEY,
-    nomePokemon VARCHAR(30) NOT NULL,
-    tipo VARCHAR(20) NOT NULL,
-    nivel INT NOT NULL DEFAULT 50,
-    vida INT NOT NULL DEFAULT 100,
-    vidaMaxima INT NOT NULL DEFAULT 100,
+CREATE TABLE forcamons (
+    id INT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    tipo VARCHAR(50) NOT NULL,
+    nivel INT DEFAULT 50,
+    hp_max INT NOT NULL,
     ataque INT NOT NULL,
     defesa INT NOT NULL,
     velocidade INT NOT NULL,
-    fraqueza VARCHAR(60) NOT NULL,
-    statusAtual VARCHAR(20) NOT NULL DEFAULT 'Saudavel'
+    fraquezas TEXT NOT NULL,
+    img VARCHAR(255) NOT NULL,
+    evolucao TEXT NULL
 );
 
 CREATE TABLE Loja (
