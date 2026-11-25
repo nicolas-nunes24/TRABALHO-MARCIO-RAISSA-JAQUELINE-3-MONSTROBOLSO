@@ -25,6 +25,41 @@ class UsuarioController {
         $this->renderizar('login');
     }
 
+    public function recuperar() {
+        $this->renderizar('recuperar');
+    }
+
+    public function enviarRecuperacao() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            registrarLog('login', "Tentativa de recuperação de senha falhou: requisição inválida.", 'Desconhecido');
+            $this->redirecionarComErro('recuperar', 'Requisição inválida.');
+        }
+
+        $email = strtolower(trim($_POST['email'] ?? ''));
+
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            registrarLog('login', "Tentativa de recuperação com e-mail inválido: {$email}", 'Desconhecido');
+            $this->redirecionarComErro('recuperar', 'Informe um e-mail válido.');
+        }
+
+        try {
+            $user = Usuario::getByColumn($email, 'email');
+
+            if ($user) {
+                registrarLog('login', "Solicitação de recuperação de senha enviada para: {$email}", $user->getNome());
+            } else {
+                registrarLog('login', "Solicitação de recuperação para e-mail não cadastrado: {$email}", 'Desconhecido');
+            }
+
+            $_SESSION['flash_success'] = 'Se o e-mail estiver cadastrado, enviamos as instruções para redefinir sua senha!';
+            header("Location: ?acao=recuperar");
+            exit;
+        } catch (Exception $e) {
+            registrarLog('login', "Erro técnico na recuperação de senha ({$email}): " . $e->getMessage(), 'Desconhecido');
+            $this->redirecionarComErro('recuperar', 'Erro ao processar solicitação: ' . $e->getMessage());
+        }
+    }
+
     public function dashboard() {
         if (empty($_SESSION['usuario_id'])) {
             header("Location: ?acao=login");

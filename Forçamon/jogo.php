@@ -8,7 +8,6 @@ if (empty($_SESSION['meu_time'])) {
 
 require_once __DIR__ . '/classes/autoload.php';
 
-// Rubizard só existe como evolução do Dragofav, então não entra como forçamon inicial.
 $soPorEvolucao = CatalogoForcamon::nomesSoPorEvolucao();
 $meuTime = array_values(array_filter(
     $_SESSION['meu_time'],
@@ -26,7 +25,7 @@ if (count($meuTime) < 3) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arena - Forçamon</title>
-  <link rel="stylesheet" href="CSS/arenaJogo.css?v=9">
+  <link rel="stylesheet" href="CSS/arenaJogo.css?v=10">
 </head>
 <body>
 
@@ -87,6 +86,7 @@ if (count($meuTime) < 3) {
     </div>
   </div>
 
+  <!-- Modal de Troca / Mochila -->
   <div class="modal-arena" id="modalArena">
     <div class="modal-box">
       <div class="modal-titulo" id="modalTitulo">Escolher</div>
@@ -95,15 +95,41 @@ if (count($meuTime) < 3) {
     </div>
   </div>
 
+  <!-- Card estilizado de Fim de Batalha -->
+  <div class="modal-arena" id="modalResultado">
+    <div class="card-resultado" id="cardResultado">
+      <div class="resultado-icone" id="resIcone">🏆</div>
+      <div class="resultado-titulo" id="resTitulo">Parabéns!</div>
+      <p class="resultado-desc" id="resDesc">Você venceu a batalha!</p>
+      <div class="resultado-premio-box">
+        <div class="premio-linha">
+          <span>Turnos jogados:</span>
+          <strong id="resTurnos">1</strong>
+        </div>
+        <div class="premio-linha">
+          <span>Recompensa ganha:</span>
+          <span class="premio-valor" id="resPremio">+ ₽ 250</span>
+        </div>
+        <div class="premio-linha">
+          <span>Saldo atual:</span>
+          <strong id="resSaldo">₽ 0</strong>
+        </div>
+      </div>
+      <div class="resultado-acoes">
+        <button class="btn-resultado-primario" onclick="irParaMontagem()">Jogar de Novo</button>
+        <button class="btn-resultado-secundario" onclick="window.location.href='site_jogo.php'">Voltar ao Menu</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    
-    const enviarLog = (categoria, mensagem) => {
-  fetch('api_log.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ categoria, mensagem })
-  });
-};
+  const enviarLog = (categoria, mensagem) => {
+    fetch('log/api_log.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoria, mensagem })
+    }).catch(() => {});
+  };
 
   const $ = id => document.getElementById(id);
   const falar = txt => $('falaDoJogo').innerText = txt;
@@ -174,7 +200,6 @@ if (count($meuTime) < 3) {
           enfileirar(x, y - 1);
         }
 
-        // Suaviza a auréola branca de 1px que encosta no fundo apagado
         for (let y = 1; y < h - 1; y++) {
           for (let x = 1; x < w - 1; x++) {
             const idx = y * w + x;
@@ -378,7 +403,37 @@ if (count($meuTime) < 3) {
     falar(log);
   }
 
-  async function encerrarBatalha(resultado, msgFinal) {
+  function exibirCardResultado(resultado, dados) {
+    const card = $('cardResultado');
+    card.className = 'card-resultado ' + resultado;
+
+    const treinador = dados.treinador || 'Treinador';
+    const recompensa = Number(dados.recompensa || 0);
+    const moedas = Number(dados.moedas || 0);
+
+    if (resultado === 'vitoria') {
+      $('resIcone').innerText = '🏆';
+      $('resTitulo').innerText = `Parabéns, ${treinador}!`;
+      $('resDesc').innerText = `Você derrotou todo o time rival e ganhou ₽ ${recompensa.toLocaleString('pt-BR')}!`;
+    } else if (resultado === 'derrota') {
+      $('resIcone').innerText = '💀';
+      $('resTitulo').innerText = 'Você foi derrotado!';
+      $('resDesc').innerText = `Todo o seu time desmaiou, mas você recebeu ₽ ${recompensa.toLocaleString('pt-BR')} de consolação.`;
+    } else {
+      $('resIcone').innerText = '🏃';
+      $('resTitulo').innerText = 'Fuga da Arena';
+      $('resDesc').innerText = 'Você recuou da batalha e não recebeu prêmio desta vez.';
+    }
+
+    $('resTurnos').innerText = Math.max(1, turnos);
+    $('resPremio').innerText = `+ ₽ ${recompensa.toLocaleString('pt-BR')}`;
+    $('resSaldo').innerText = `₽ ${moedas.toLocaleString('pt-BR')}`;
+
+    $('modalResultado').classList.add('ativo');
+  }
+
+  async function encerrarBatalha(resultado) {
+    let dados = { recompensa: 0, moedas: 0, treinador: 'Treinador' };
     try {
       const res = await fetch('api_batalha.php', {
         method: 'POST',
@@ -391,21 +446,19 @@ if (count($meuTime) < 3) {
           turnos
         })
       });
-      const dados = await res.json();
-      if (dados.ok && dados.recompensa > 0) {
-        msgFinal += `\nPrêmio: ₽ ${dados.recompensa} (Saldo: ₽ ${dados.moedas})`;
-      }
+      const json = await res.json();
+      if (json.ok) dados = json;
     } catch (e) {
       console.error(e);
     }
-    alert(msgFinal);
-    irParaMontagem();
+    exibirCardResultado(resultado, dados);
   }
 
   function fugirBatalha() {
     if (travado) return;
     travado = true;
-    encerrarBatalha('fuga', 'Você fugiu da arena!');
+    falar('Você fugiu da batalha!');
+    encerrarBatalha('fuga');
   }
 
   function escolherGolpeBot(op) {
@@ -460,7 +513,7 @@ if (count($meuTime) < 3) {
         falar(`${op.nome} caiu! O rival mandou ${timeInimigo[prox].nome}!`);
         travado = false;
       } else {
-        encerrarBatalha('vitoria', 'Vitória! Você derrubou todo o time rival.');
+        encerrarBatalha('vitoria');
       }
     }, 1200);
   }
@@ -482,7 +535,7 @@ if (count($meuTime) < 3) {
         falar(`${bicho.nome} caiu! Vai, ${meuTime[prox].nome}!`);
         travado = false;
       } else {
-        encerrarBatalha('derrota', 'Derrota! Todo o seu time desmaiou.');
+        encerrarBatalha('derrota');
       }
     }, 1200);
   }
@@ -491,8 +544,6 @@ if (count($meuTime) < 3) {
     $('modalArena').classList.remove('ativo');
   }
 
-  // Copia os dados da forma evoluída (vindos do servidor) pro bicho que está em jogo,
-  // mantendo PP dos golpes e estágios de ataque/defesa.
   function aplicarForma(bicho, forma) {
     bicho.nome = forma.nome;
     bicho.img = forma.img;
@@ -523,7 +574,6 @@ if (count($meuTime) < 3) {
     falar(`O quê? ${nomeAntigo} está evoluindo!`);
     animar('boxJogador', 'anim-evolucao', 1700);
 
-    // troca a forma no ponto mais claro da animação
     setTimeout(() => {
       aplicarForma(bicho, dados.forma);
       atualizarArena();
