@@ -171,6 +171,7 @@
     .card-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; letter-spacing: .2px; }
     .card-num { font-weight: 700; font-size: .85rem; color: #aebbe3; }
     .tipos { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .evo-info { margin-top: 8px; padding: 4px 8px; font-size: .78rem; line-height: 1.3; color: #12285a; background: #ffcb05; border-radius: 8px; }
     .tipo {
       font-family: 'Nunito', sans-serif;
       font-weight: 800;
@@ -315,6 +316,7 @@
           <div class="card-label">
             <div class="linha"><span class="card-name">Rubizard</span><span class="card-num">Nº 0006</span></div>
             <div class="tipos"><span class="tipo" style="background:#c4491a">Fogo</span></div>
+            <div class="evo-info">Evolução do <strong>Dragofav</strong></div>
           </div>
         </div>
         <div class="card-item" data-name="vianalax" data-types="normal" data-fav="false">
@@ -363,6 +365,7 @@
           <div class="card-label">
             <div class="linha"><span class="card-name">Dragofav</span><span class="card-num">Nº 0149</span></div>
             <div class="tipos"><span class="tipo" style="background:#503dba">Dragão</span><span class="tipo" style="background:#5f7fc0">Voador</span></div>
+            <div class="evo-info">Evolui para <strong>Rubizard</strong> com a Pedra Preciosa</div>
           </div>
         </div>
         <div class="card-item" data-name="velostervroom" data-types="steel poison" data-fav="false">

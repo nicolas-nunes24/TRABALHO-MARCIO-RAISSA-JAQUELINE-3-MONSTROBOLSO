@@ -1,17 +1,30 @@
 <?php
   require_once __DIR__ . "/log/registrar_log.php";
+  require_once __DIR__ . "/classes/autoload.php";
   session_start();
+
+  // forçamons que só aparecem evoluindo outro (não entram no time)
+  $soPorEvolucao = CatalogoForcamon::nomesSoPorEvolucao();
+  $semBloqueados = fn(array $time) => array_values(array_filter(
+      $time,
+      fn($p) => !in_array($p['nome'] ?? '', $soPorEvolucao, true)
+  ));
   
   // salva o time escolhido e manda pra batalha
   if (isset($_POST['time_selecionado'])) {
-      $_SESSION['meu_time'] = json_decode($_POST['time_selecionado'], true);
-      $nomes = implode(', ', array_column($_SESSION['meu_time'], 'nome'));
+      $time = $semBloqueados(json_decode($_POST['time_selecionado'], true) ?: []);
+      if (count($time) !== 3) {
+          header("Location: monte_time.php");
+          exit;
+      }
+      $_SESSION['meu_time'] = $time;
+      $nomes = implode(', ', array_column($time, 'nome'));
       registrarLog('time', "Montou o time: [{$nomes}].");
       header("Location: jogo.php");
       exit;
   }
 
-  $meuTimeSalvo = isset($_SESSION['meu_time']) ? $_SESSION['meu_time'] : [];
+  $meuTimeSalvo = $semBloqueados($_SESSION['meu_time'] ?? []);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -222,6 +235,10 @@
     .t-dragao { background: #5b3fd1; }
     .t-aco { background: #5c7a94; }
 
+    .card.bloqueado { cursor: not-allowed; opacity: .55; filter: grayscale(.7); }
+    .card.bloqueado:hover { border-color: #fff; }
+    .evo-nota { padding: 4px 10px; font-size: .75rem; line-height: 1.25; text-align: center; color: #12285a; background: #ffcb05; }
+
     /* já escolhido */
     .card.sumido { opacity: .3; filter: grayscale(1); pointer-events: none; }
 
@@ -265,14 +282,14 @@
       <div class="aba">Forçamons</div>
 
       <div class="grade-cards">
-        <div class="card" id="rubizard" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/rubizard.png" data-nome="Rubizard" data-tipo="fogo"><img src="imagens-personagens/rubizard.png"><div class="info"><span class="nome">Rubizard</span><span class="tipo t-fogo">Fogo</span></div></div>
+        <div class="card bloqueado" id="rubizard" data-img="imagens-personagens/rubizard.png" data-nome="Rubizard" data-tipo="fogo"><img src="imagens-personagens/rubizard.png"><div class="info"><span class="nome">Rubizard</span><span class="tipo t-fogo">Fogo</span></div><div class="evo-nota">Disponível somente para evolução</div></div>
         <div class="card" id="nilldrill" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/nilldrill.png" data-nome="Nilldrill" data-tipo="planta"><img src="imagens-personagens/nilldrill.png"><div class="info"><span class="nome">Nilldrill</span><span class="tipo t-planta">Planta</span></div></div>
         <div class="card" id="vianalax" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/vianalax.png" data-nome="Vianalax" data-tipo="normal"><img src="imagens-personagens/vianalax.png"><div class="info"><span class="nome">Vianalax</span><span class="tipo t-normal">Normal</span></div></div>
         <div class="card" id="violetwo" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/violetwo.png" data-nome="Violetwo" data-tipo="psiquico"><img src="imagens-personagens/violetwo.png"><div class="info"><span class="nome">Violetwo</span><span class="tipo t-psiquico">Psíquico</span></div></div>
         <div class="card" id="darkvi" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/darkvi.png" data-nome="Darkvi" data-tipo="dark"><img src="imagens-personagens/darkvi.png"><div class="info"><span class="nome">Darkvi</span><span class="tipo t-dark">Sombrio</span></div></div>
         <div class="card" id="brrpatana" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/brrpatana.png" data-nome="Brrpatana" data-tipo="agua"><img src="imagens-personagens/brrpatana.png"><div class="info"><span class="nome">Brrpatana</span><span class="tipo t-agua">Água</span></div></div>
         <div class="card" id="meloetta" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/meloetta.png" data-nome="Meloetta" data-tipo="normal"><img src="imagens-personagens/meloetta.png"><div class="info"><span class="nome">Meloetta</span><span class="tipo t-normal">Normal</span></div></div>
-        <div class="card" id="dragofav" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/dragofav.png" data-nome="Dragofav" data-tipo="dragao"><img src="imagens-personagens/dragofav.png"><div class="info"><span class="nome">Dragofav</span><span class="tipo t-dragao">Dragão</span></div></div>
+        <div class="card" id="dragofav" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/dragofav.png" data-nome="Dragofav" data-tipo="dragao"><img src="imagens-personagens/dragofav.png"><div class="info"><span class="nome">Dragofav</span><span class="tipo t-dragao">Dragão</span></div><div class="evo-nota">Evolui para Rubizard (Pedra Preciosa)</div></div>
         <div class="card" id="velostervroom" draggable="true" ondragstart="pegarCard(event)" onclick="clicarCard(this)" data-img="imagens-personagens/velostervroom.png" data-nome="Velostervroom" data-tipo="aco"><img src="imagens-personagens/velostervroom.png"><div class="info"><span class="nome">Velostervroom</span><span class="tipo t-aco">Aço</span></div></div>
       </div>
     </section>
@@ -332,7 +349,7 @@
 
     function colocarNoSlot(slot, cardId) {
       let cardEl = document.getElementById(cardId);
-      if (!cardEl) return;
+      if (!cardEl || cardEl.classList.contains('bloqueado')) return;
       slot.classList.add('preenchido');
       slot.setAttribute('data-card-id', cardId);
       slot.setAttribute('data-nome', cardEl.getAttribute('data-nome'));

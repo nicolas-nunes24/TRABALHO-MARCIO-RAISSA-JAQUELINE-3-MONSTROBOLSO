@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['novo_treinador'])) {
         $nome = trim($_POST['novo_treinador']);
         if ($nome !== '') {
-            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 500)");
+            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 650)");
             $ins->execute([':u' => $usuarioId, ':n' => $nome]);
             $_SESSION['id_perfil'] = (int)$db->lastInsertId();
             $_SESSION['usuario_nome'] = $nome;

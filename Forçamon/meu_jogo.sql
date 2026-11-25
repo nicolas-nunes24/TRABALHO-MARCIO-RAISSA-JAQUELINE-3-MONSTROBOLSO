@@ -7,14 +7,14 @@ CREATE TABLE Usuario (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    moedas INT NOT NULL DEFAULT 500
+    moedas INT NOT NULL DEFAULT 650
 );
 
 CREATE TABLE Perfil (
     id_perfil INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     nome_treinador VARCHAR(60) NOT NULL,
-    moedas INT NOT NULL DEFAULT 500,
+    moedas INT NOT NULL DEFAULT 650,
     vitorias INT NOT NULL DEFAULT 0,
     derrotas INT NOT NULL DEFAULT 0,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,6 +77,14 @@ CREATE TABLE LogBatalha (
     FOREIGN KEY (id_perfil) REFERENCES Perfil(id_perfil) ON DELETE CASCADE
 );
 
+CREATE TABLE ForcamonEvoluido (
+    id_perfil INT NOT NULL,
+    id_forcamon INT NOT NULL,
+    evoluido_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_perfil, id_forcamon),
+    FOREIGN KEY (id_perfil) REFERENCES Perfil(id_perfil) ON DELETE CASCADE
+);
+
 INSERT INTO Loja (nomeItem, tipoItem, valorEfeito, statusCura, valorItem, slugApi) VALUES
 ('Tô Confusa',        'hp',       20,   NULL,           100,  'potion'),
 ('Saudades bb',     'hp',       50,   NULL,           250,  'super-potion'),
@@ -90,7 +98,7 @@ INSERT INTO Loja (nomeItem, tipoItem, valorEfeito, statusCura, valorItem, slugAp
 ('Desbloqueado',      'status',   NULL, 'paralisia',    150,  'paralyze-heal'),
 ('Eu Já Superei',     'status',   NULL, 'todos',        400,  'full-heal'),
 ('Eu Vou mais eu Volto',  'reviver',  50,   NULL,           1000, 'revive'),
-('Pedra Preciosa',    'evolucao', 20,   NULL,           2000, 'moon-stone');
+('Pedra Preciosa',    'evolucao', 20,   NULL,           1800, 'moon-stone');
 
 CREATE VIEW vw_loja_itens AS
 SELECT id_item, nomeItem, tipoItem, valorEfeito, statusCura, valorItem, slugApi

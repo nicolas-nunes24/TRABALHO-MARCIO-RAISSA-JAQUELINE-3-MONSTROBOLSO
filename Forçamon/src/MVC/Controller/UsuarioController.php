@@ -66,7 +66,7 @@ class UsuarioController {
 
             if ($usuario->salvar()) {
                 $db = conexao();
-                $st = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 500)");
+                $st = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 650)");
                 $st->execute([':u' => $usuario->getId(), ':n' => $nome]);
 
                 $_SESSION['flash_success'] = 'Conta criada com sucesso!';
@@ -141,7 +141,7 @@ class UsuarioController {
         $perfil = $st->fetch(PDO::FETCH_ASSOC);
 
         if (!$perfil) {
-            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 500)");
+            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 650)");
             $ins->execute([':u' => $usuarioId, ':n' => $nomePadrao]);
             $_SESSION['id_perfil'] = (int)$db->lastInsertId();
             $_SESSION['usuario_nome'] = $nomePadrao;
