@@ -7,13 +7,14 @@ class BatalhaService
 
     public function __construct(?PDO $pdo = null)
     {
-        $this->pdo =$pdo ?? Conexao::obter();
+        $this->pdo = $pdo ?? Conexao::obter();
     }
 
-    public function registrarResultado(int $perfilId, array $timeJogador, array$timeOponente, string $resultado, int$turnos): array
+    public function registrarResultado(int $perfilId, array $timeJogador, array $timeOponente, string $resultado, int $turnos): array
     {
         $resultadosValidos = ['vitoria', 'derrota', 'fuga'];
-        if (!in_array($resultado, $resultadosValidos, true)) {$resultado = 'derrota';
+        if (!in_array($resultado, $resultadosValidos, true)) {
+            $resultado = 'derrota';
         }
 
         $recompensa = match ($resultado) {
@@ -22,13 +23,17 @@ class BatalhaService
             default   => 0,
         };
 
-        $turnos = max(1,$turnos);
-        $strJogador = implode(', ',$timeJogador);
-        $strOponente = implode(', ',$timeOponente);
+        $turnos = max(1, $turnos);
+        $strJogador = implode(', ', $timeJogador);
+        $strOponente = implode(', ', $timeOponente);
 
         $this->pdo->beginTransaction();
         try {
-            $st = $this->pdo->prepare( 'INSERT INTO LogBatalha (id_perfil, time_jogador, time_oponente, resultado, turnos, moedas_ganhas) VALUES (:p, :tj, :to, :r, :t, :m)' );$st->execute([
+            $st = $this->pdo->prepare(
+                'INSERT INTO LogBatalha (id_perfil, time_jogador, time_oponente, resultado, turnos, moedas_ganhas)
+                 VALUES (:p, :tj, :to, :r, :t, :m)'
+            );
+            $st->execute([
                 ':p'  => $perfilId,
                 ':tj' => $strJogador,
                 ':to' => $strOponente,
@@ -37,39 +42,54 @@ class BatalhaService
                 ':m'  => $recompensa,
             ]);
 
-            if ($resultado === 'vitoria') {$upd = $this->pdo->prepare('UPDATE Perfil SET moedas = moedas + :m, vitorias = vitorias + 1 WHERE id_perfil = :p');$upd->execute([':m' => $recompensa, ':p' =>$perfilId]);
-            } elseif ($resultado === 'derrota') {$upd = $this->pdo->prepare('UPDATE Perfil SET moedas = moedas + :m, derrotas = derrotas + 1 WHERE id_perfil = :p');$upd->execute([':m' => $recompensa, ':p' =>$perfilId]);
+            if ($resultado === 'vitoria') {
+                $upd = $this->pdo->prepare('UPDATE Perfil SET moedas = moedas + :m, vitorias = vitorias + 1 WHERE id_perfil = :p');
+                $upd->execute([':m' => $recompensa, ':p' => $perfilId]);
+            } elseif ($resultado === 'derrota') {
+                $upd = $this->pdo->prepare('UPDATE Perfil SET moedas = moedas + :m, derrotas = derrotas + 1 WHERE id_perfil = :p');
+                $upd->execute([':m' => $recompensa, ':p' => $perfilId]);
             }
 
-            $saldo =$this->pdo->prepare('SELECT nome_treinador, moedas FROM Perfil WHERE id_perfil = :p');
-            $saldo->execute([':p' =>$perfilId]);
-            $perfil =$saldo->fetch();
+            $saldo = $this->pdo->prepare('SELECT nome_treinador, moedas FROM Perfil WHERE id_perfil = :p');
+            $saldo->execute([':p' => $perfilId]);
+            $perfil = $saldo->fetch();
 
-            $moedasAtual = (int)($perfil['moedas'] ?? 0);$treinador = $perfil['nome_treinador'] ?? ($_SESSION['usuario_nome'] ?? 'Treinador');
+            $moedasAtual = (int)($perfil['moedas'] ?? 0);
+            $treinador = $perfil['nome_treinador'] ?? ($_SESSION['usuario_nome'] ?? 'Treinador');
 
             $this->pdo->commit();
 
             registrarLog(
                 'batalha',
-                "Resultado: {$resultado} | Turnos: {$turnos} \vert{} Time: [{$strJogador}] vs [{$strOponente}] \vert{} Prêmio: ₽ {$recompensa}",
+                "Resultado: {$resultado} | Turnos: {$turnos} | Time: [{$strJogador}] vs [{$strOponente}] | Prêmio: ₽ {$recompensa}",
                 $treinador
             );
 
             return [
-                'resultado'   => $resultado,
-                'recompensa'  => $recompensa,
-                'moedas'      => $moedasAtual,
-                'treinador'   => $treinador,
-                'turnos'      => $turnos
+                'resultado'  => $resultado,
+                'recompensa' => $recompensa,
+                'moedas'     => $moedasAtual,
+                'treinador'  => $treinador,
+                'turnos'     => $turnos,
             ];
-        } catch (Throwable $e) {$this->pdo->rollBack();
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
             throw $e;
         }
     }
 
-    public function listarHistorico(int $perfilId, int$limite = 10): array
+    public function listarHistorico(int $perfilId, int $limite = 10): array
     {
-        $st = $this->pdo->prepare( 'SELECT id_batalha, time_jogador, time_oponente, resultado, turnos, moedas_ganhas, data_batalha FROM LogBatalha WHERE id_perfil = :p ORDER BY data_batalha DESC LIMIT :lim' );$st->bindValue(':p', $perfilId, PDO::PARAM_INT);$st->bindValue(':lim', $limite, PDO::PARAM_INT);$st->execute();
+        $st = $this->pdo->prepare(
+            'SELECT id_batalha, time_jogador, time_oponente, resultado, turnos, moedas_ganhas, data_batalha
+             FROM LogBatalha
+             WHERE id_perfil = :p
+             ORDER BY data_batalha DESC
+             LIMIT :lim'
+        );
+        $st->bindValue(':p', $perfilId, PDO::PARAM_INT);
+        $st->bindValue(':lim', $limite, PDO::PARAM_INT);
+        $st->execute();
         return $st->fetchAll();
     }
 }
