@@ -6,7 +6,18 @@ if (empty($_SESSION['meu_time'])) {
     exit;
 }
 
-$meuTime = $_SESSION['meu_time'];
+require_once __DIR__ . '/classes/autoload.php';
+
+$soPorEvolucao = CatalogoForcamon::nomesSoPorEvolucao();
+$meuTime = array_values(array_filter(
+    $_SESSION['meu_time'],
+    fn($p) => !in_array($p['nome'] ?? '', $soPorEvolucao, true)
+));
+
+if (count($meuTime) < 3) {
+    header("Location: monte_time.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -14,7 +25,7 @@ $meuTime = $_SESSION['meu_time'];
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arena - Forçamon</title>
-  <link rel="stylesheet" href="CSS/arenaJogo.css?v=9">
+  <link rel="stylesheet" href="CSS/arenaJogo.css?v=10">
 </head>
 <body>
 
@@ -75,6 +86,7 @@ $meuTime = $_SESSION['meu_time'];
     </div>
   </div>
 
+  <!-- Modal de Troca / Mochila -->
   <div class="modal-arena" id="modalArena">
     <div class="modal-box">
       <div class="modal-titulo" id="modalTitulo">Escolher</div>
@@ -83,15 +95,41 @@ $meuTime = $_SESSION['meu_time'];
     </div>
   </div>
 
+  <!-- Card estilizado de Fim de Batalha -->
+  <div class="modal-arena" id="modalResultado">
+    <div class="card-resultado" id="cardResultado">
+      <div class="resultado-icone" id="resIcone">🏆</div>
+      <div class="resultado-titulo" id="resTitulo">Parabéns!</div>
+      <p class="resultado-desc" id="resDesc">Você venceu a batalha!</p>
+      <div class="resultado-premio-box">
+        <div class="premio-linha">
+          <span>Turnos jogados:</span>
+          <strong id="resTurnos">1</strong>
+        </div>
+        <div class="premio-linha">
+          <span>Recompensa ganha:</span>
+          <span class="premio-valor" id="resPremio">+ ₽ 250</span>
+        </div>
+        <div class="premio-linha">
+          <span>Saldo atual:</span>
+          <strong id="resSaldo">₽ 0</strong>
+        </div>
+      </div>
+      <div class="resultado-acoes">
+        <button class="btn-resultado-primario" onclick="irParaMontagem()">Jogar de Novo</button>
+        <button class="btn-resultado-secundario" onclick="window.location.href='site_jogo.php'">Voltar ao Menu</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    
-    const enviarLog = (categoria, mensagem) => {
-  fetch('api_log.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ categoria, mensagem })
-  });
-};
+  const enviarLog = (categoria, mensagem) => {
+    fetch('log/api_log.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoria, mensagem })
+    }).catch(() => {});
+  };
 
   const $ = id => document.getElementById(id);
   const falar = txt => $('falaDoJogo').innerText = txt;
@@ -99,7 +137,7 @@ $meuTime = $_SESSION['meu_time'];
   const multEstagio = e => e >= 0 ? (2 + e) / 2 : 2 / (2 - e);
 
   const cacheSprites = {};
-  function carregarSpriteTransparente(imgEl, url) {
+  function carregarSpriteTransparente(imgEl, url, reserva) {
     if (!url) return;
     if (cacheSprites[url]) {
       imgEl.src = cacheSprites[url];
@@ -162,7 +200,6 @@ $meuTime = $_SESSION['meu_time'];
           enfileirar(x, y - 1);
         }
 
-        // Suaviza a auréola branca de 1px que encosta no fundo apagado
         for (let y = 1; y < h - 1; y++) {
           for (let x = 1; x < w - 1; x++) {
             const idx = y * w + x;
@@ -185,7 +222,13 @@ $meuTime = $_SESSION['meu_time'];
         imgEl.src = url;
       }
     };
-    temp.onerror = () => { imgEl.src = url; };
+    temp.onerror = () => {
+      if (reserva && reserva !== url) {
+        carregarSpriteTransparente(imgEl, reserva);
+      } else {
+        imgEl.src = url;
+      }
+    };
     temp.src = url;
   }
 
@@ -221,7 +264,8 @@ $meuTime = $_SESSION['meu_time'];
       status: p.status || 'Saudavel',
       fraquezas: p.fraquezas || [],
       evolucao: p.evolucao || null,
-      evoluido: false,
+      imgBase: p.imgBase || p.img,
+      evoluido: p.evoluido || false,
       estagios: { ata: 0, def: 0 },
       golpes: golpesBase.map(g => ({
         ...g,
@@ -248,13 +292,13 @@ $meuTime = $_SESSION['meu_time'];
   let turnos = 0;
   let travado = true;
 
-  function animar(idElemento, classeAnim) {
+  function animar(idElemento, classeAnim, duracao = 950) {
     const el = $(idElemento);
     if (!el) return;
     el.classList.remove(classeAnim);
     void el.offsetWidth;
     el.classList.add(classeAnim);
-    setTimeout(() => el.classList.remove(classeAnim), 950);
+    setTimeout(() => el.classList.remove(classeAnim), duracao);
   }
 
   function atualizarBarraHP(idBarra, idTexto, hp, hpMax) {
@@ -270,11 +314,11 @@ $meuTime = $_SESSION['meu_time'];
     const op = timeInimigo[vezDoInimigo];
 
     $('nomeJogador').innerText = bicho.nome;
-    carregarSpriteTransparente($('imgJogador'), bicho.img);
+    carregarSpriteTransparente($('imgJogador'), bicho.img, bicho.imgBase);
     atualizarBarraHP('barraJogador', 'hpJogadorTexto', bicho.hp, bicho.hpMax);
 
     $('nomeInimigo').innerText = op.nome;
-    carregarSpriteTransparente($('imgInimigo'), op.img);
+    carregarSpriteTransparente($('imgInimigo'), op.img, op.imgBase);
     atualizarBarraHP('barraInimigo', 'hpInimigoTexto', op.hp, op.hpMax);
 
     const botoes = [$('btnAtaque1'), $('btnAtaque2'), $('btnAtaque3')];
@@ -359,7 +403,37 @@ $meuTime = $_SESSION['meu_time'];
     falar(log);
   }
 
-  async function encerrarBatalha(resultado, msgFinal) {
+  function exibirCardResultado(resultado, dados) {
+    const card = $('cardResultado');
+    card.className = 'card-resultado ' + resultado;
+
+    const treinador = dados.treinador || 'Treinador';
+    const recompensa = Number(dados.recompensa || 0);
+    const moedas = Number(dados.moedas || 0);
+
+    if (resultado === 'vitoria') {
+      $('resIcone').innerText = '🏆';
+      $('resTitulo').innerText = `Parabéns, ${treinador}!`;
+      $('resDesc').innerText = `Você derrotou todo o time rival e ganhou ₽ ${recompensa.toLocaleString('pt-BR')}!`;
+    } else if (resultado === 'derrota') {
+      $('resIcone').innerText = '💀';
+      $('resTitulo').innerText = 'Você foi derrotado!';
+      $('resDesc').innerText = `Todo o seu time desmaiou, mas você recebeu ₽ ${recompensa.toLocaleString('pt-BR')} de consolação.`;
+    } else {
+      $('resIcone').innerText = '🏃';
+      $('resTitulo').innerText = 'Fuga da Arena';
+      $('resDesc').innerText = 'Você recuou da batalha e não recebeu prêmio desta vez.';
+    }
+
+    $('resTurnos').innerText = Math.max(1, turnos);
+    $('resPremio').innerText = `+ ₽ ${recompensa.toLocaleString('pt-BR')}`;
+    $('resSaldo').innerText = `₽ ${moedas.toLocaleString('pt-BR')}`;
+
+    $('modalResultado').classList.add('ativo');
+  }
+
+  async function encerrarBatalha(resultado) {
+    let dados = { recompensa: 0, moedas: 0, treinador: 'Treinador' };
     try {
       const res = await fetch('api_batalha.php', {
         method: 'POST',
@@ -372,21 +446,19 @@ $meuTime = $_SESSION['meu_time'];
           turnos
         })
       });
-      const dados = await res.json();
-      if (dados.ok && dados.recompensa > 0) {
-        msgFinal += `\nPrêmio: ₽ ${dados.recompensa} (Saldo: ₽ ${dados.moedas})`;
-      }
+      const json = await res.json();
+      if (json.ok) dados = json;
     } catch (e) {
       console.error(e);
     }
-    alert(msgFinal);
-    irParaMontagem();
+    exibirCardResultado(resultado, dados);
   }
 
   function fugirBatalha() {
     if (travado) return;
     travado = true;
-    encerrarBatalha('fuga', 'Você fugiu da arena!');
+    falar('Você fugiu da batalha!');
+    encerrarBatalha('fuga');
   }
 
   function escolherGolpeBot(op) {
@@ -441,7 +513,7 @@ $meuTime = $_SESSION['meu_time'];
         falar(`${op.nome} caiu! O rival mandou ${timeInimigo[prox].nome}!`);
         travado = false;
       } else {
-        encerrarBatalha('vitoria', 'Vitória! Você derrubou todo o time rival.');
+        encerrarBatalha('vitoria');
       }
     }, 1200);
   }
@@ -463,13 +535,60 @@ $meuTime = $_SESSION['meu_time'];
         falar(`${bicho.nome} caiu! Vai, ${meuTime[prox].nome}!`);
         travado = false;
       } else {
-        encerrarBatalha('derrota', 'Derrota! Todo o seu time desmaiou.');
+        encerrarBatalha('derrota');
       }
     }, 1200);
   }
 
   function fecharModal() {
     $('modalArena').classList.remove('ativo');
+  }
+
+  function aplicarForma(bicho, forma) {
+    bicho.nome = forma.nome;
+    bicho.img = forma.img;
+    bicho.hpMax = forma.hpMax;
+    bicho.hp = forma.hp;
+    bicho.ataque = forma.ataque;
+    bicho.defesa = forma.defesa;
+    bicho.velocidade = forma.velocidade;
+    bicho.evoluido = true;
+  }
+
+  async function evoluirAtivo(selecionado) {
+    const bicho = meuTime[vezDoBicho];
+
+    if (bicho.evoluido) return falar(`${bicho.nome} já evoluiu!`);
+    if (!bicho.evolucao) return falar(`${bicho.nome} não tem evolução. A pedra não foi gasta.`);
+
+    const res = await fetch('api_batalha.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ acao: 'evoluir', forcamon_id: bicho.id, item_id: selecionado.id_item })
+    });
+    const dados = await res.json();
+    if (!dados.ok) return falar(dados.mensagem);
+
+    const nomeAntigo = bicho.nome;
+    travado = true;
+    falar(`O quê? ${nomeAntigo} está evoluindo!`);
+    animar('boxJogador', 'anim-evolucao', 1700);
+
+    setTimeout(() => {
+      aplicarForma(bicho, dados.forma);
+      atualizarArena();
+    }, 800);
+
+    setTimeout(() => {
+      falar(`${nomeAntigo} evoluiu para ${bicho.nome}!`);
+      enviarLog('itens', `${nomeAntigo} evoluiu para ${bicho.nome}.`);
+    }, 1700);
+
+    setTimeout(() => {
+      const op = timeInimigo[vezDoInimigo];
+      aplicarGolpe(op, bicho, escolherGolpeBot(op), false);
+      checarDesmaioJogador(bicho);
+    }, 3300);
   }
 
   function abrirTroca() {
@@ -533,6 +652,13 @@ $meuTime = $_SESSION['meu_time'];
   async function usarItemMochila(selecionado) {
     fecharModal();
     try {
+      if (selecionado.tipoItem === 'evolucao') {
+        return await evoluirAtivo(selecionado);
+      }
+      if (selecionado.tipoItem === 'reviver' && !meuTime.some(p => p.hp <= 0)) {
+        return falar("Ninguém desmaiou ainda. O item não foi gasto.");
+      }
+
       const usoRes = await fetch('api_batalha.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -552,25 +678,6 @@ $meuTime = $_SESSION['meu_time'];
         if (caido) {
           caido.hp = Math.floor(caido.hpMax / 2);
           msgUso = `${caido.nome} levantou de volta pra luta!`;
-        }
-      } else if (selecionado.tipoItem === 'evolucao') {
-        animar('boxJogador', 'anim-evolucao');
-        if (bicho.evolucao && bicho.evolucao.nome && !bicho.evoluido) {
-          const nomeAntigo = bicho.nome;
-          bicho.nome = bicho.evolucao.nome;
-          bicho.hpMax += bicho.evolucao.bonusHp || 30;
-          bicho.hp = bicho.hpMax;
-          bicho.ataque += bicho.evolucao.bonusAtaque || 25;
-          bicho.defesa += bicho.evolucao.bonusDefesa || 20;
-          bicho.velocidade += bicho.evolucao.bonusVelocidade || 15;
-          if (bicho.evolucao.img) bicho.img = bicho.evolucao.img;
-          bicho.evoluido = true;
-          msgUso = `${nomeAntigo} evoluiu para ${bicho.nome}!`;
-        } else {
-          bicho.hpMax += 25;
-          bicho.hp += 25;
-          bicho.ataque += 20;
-          msgUso = `${bicho.nome} ficou mais forte com ${selecionado.nomeItem}!`;
         }
       }
 
@@ -592,6 +699,20 @@ $meuTime = $_SESSION['meu_time'];
     }
   }
 
+  async function aplicarEvolucoesSalvas() {
+    try {
+      const res = await fetch('api_batalha.php?acao=evolucoes');
+      const dados = await res.json();
+      if (!dados.ok) return;
+      dados.formas.forEach(forma => {
+        const bicho = meuTime.find(p => p.id === forma.id);
+        if (bicho) aplicarForma(bicho, forma);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   window.onload = async () => {
     try {
       const res = await fetch('api_pokemons.php');
@@ -609,6 +730,8 @@ $meuTime = $_SESSION['meu_time'];
           hp: oficial.hpMax
         });
       });
+
+      await aplicarEvolucoesSalvas();
 
       timeInimigo = sortearInimigos(catalogo, 3);
       travado = false;

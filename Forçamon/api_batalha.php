@@ -28,6 +28,19 @@ try {
             $item = $mochila->consumir((int)($corpo['item_id'] ?? 0));
             responder(['ok' => true, 'item' => $item]);
 
+        case 'evolucoes':
+            $modelo = new EvolucaoModel();
+            responder(['ok' => true, 'formas' => $modelo->formasEvoluidas($perfilId)]);
+
+        case 'evoluir':
+            $modelo = new EvolucaoModel();
+            $forma = $modelo->evoluir(
+                $perfilId,
+                (int)($corpo['forcamon_id'] ?? 0),
+                (int)($corpo['item_id'] ?? 0)
+            );
+            responder(['ok' => true, 'forma' => $forma]);
+
         case 'finalizar':
             $service = new BatalhaService();
             $res = $service->registrarResultado(
@@ -42,7 +55,7 @@ try {
         default:
             responder(['ok' => false, 'mensagem' => 'Ação inválida.'], 400);
     }
-} catch (ItemNaoEncontradoException $e) {
+} catch (ItemNaoEncontradoException | EvolucaoInvalidaException $e) {
     responder(['ok' => false, 'mensagem' => $e->getMessage()], 400);
 } catch (Throwable $e) {
     responder(['ok' => false, 'mensagem' => 'Erro na operação.'], 500);

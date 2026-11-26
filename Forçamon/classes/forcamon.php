@@ -14,6 +14,7 @@ abstract class Forcamon
     protected string $status;
     protected string $img;
     protected ?array $evolucao;
+    protected bool $evoluido;
 
     /**
      * Recebe um array associativo ($dados) com as informações do Forcamon.
@@ -34,6 +35,7 @@ abstract class Forcamon
         $this->status = (string)($dados['status'] ?? 'Saudavel');
         $this->img = (string)($dados['img'] ?? '');
         $this->evolucao = $dados['evolucao'] ?? null;
+        $this->evoluido = (bool)($dados['evoluido'] ?? false);
     }
 
     /**
@@ -81,10 +83,53 @@ abstract class Forcamon
      */
     public function getVelocidade(): int { return $this->velocidade; }
 
+<<<<<<< HEAD
     /**
      * Não recebe parâmetros.
      * Converte e retorna todas as propriedades do Forcamon, incluindo seus golpes, em um array associativo.
      */
+=======
+    public function getId(): int { return $this->id; }
+    public function getVidaMaxima(): int { return $this->hpMax; }
+    public function estaVivo(): bool { return $this->hp > 0; }
+    public function jaEvoluiu(): bool { return $this->evoluido; }
+
+    public function podeEvoluir(): bool
+    {
+        return $this->evolucao !== null && !$this->evoluido;
+    }
+
+    public function curar(int $quantidade): void
+    {
+        $this->setHp($this->hp + $quantidade);
+    }
+
+    public function curarStatus(): void
+    {
+        $this->status = 'Saudavel';
+    }
+
+    public function evoluir(): void
+    {
+        if ($this->evolucao === null) {
+            throw new EvolucaoInvalidaException("{$this->nome} não possui evolução.");
+        }
+        if ($this->evoluido) {
+            throw new EvolucaoInvalidaException("{$this->nome} já evoluiu.");
+        }
+
+        $evo = $this->evolucao;
+        $this->nome = $evo['nome'] !== '' ? $evo['nome'] : $this->nome;
+        $this->img = $evo['img'] ?? $this->img;
+        $this->hpMax += (int)($evo['bonusHp'] ?? 0);
+        $this->ataque += (int)($evo['bonusAtaque'] ?? 0);
+        $this->defesa += (int)($evo['bonusDefesa'] ?? 0);
+        $this->velocidade += (int)($evo['bonusVelocidade'] ?? 0);
+        $this->hp = $this->hpMax;
+        $this->evoluido = true;
+    }
+
+>>>>>>> 13e3c02a66f83b4eeafc22cfc3b410a5341c1a10
     public function paraArray(): array
     {
         return [
@@ -101,6 +146,7 @@ abstract class Forcamon
             'status' => $this->status,
             'img' => $this->img,
             'evolucao' => $this->evolucao,
+            'evoluido' => $this->evoluido,
             'golpes' => $this->getGolpes(),
         ];
     }

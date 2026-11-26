@@ -1,0 +1,8 @@
+# logs com dados reais de teste
+*.log
+
+# arquivos do editor/sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

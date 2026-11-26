@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['novo_treinador'])) {
         $nome = trim($_POST['novo_treinador']);
         if ($nome !== '') {
-            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 500)");
+            $ins = $db->prepare("INSERT INTO Perfil (id_usuario, nome_treinador, moedas) VALUES (:u, :n, 650)");
             $ins->execute([':u' => $usuarioId, ':n' => $nome]);
             $_SESSION['id_perfil'] = (int)$db->lastInsertId();
             $_SESSION['usuario_nome'] = $nome;
@@ -43,6 +43,9 @@ $stmt = $db->prepare("SELECT * FROM Perfil WHERE id_usuario = :u ORDER BY id_per
 $stmt->execute([':u' => $usuarioId]);
 $perfis = $stmt->fetchAll();
 $perfilAtivo = (int)($_SESSION['id_perfil'] ?? ($perfis[0]['id_perfil'] ?? 1));
+
+$batalhaService = new BatalhaService($db);
+$historico = $batalhaService->listarHistorico($perfilAtivo, 10);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -50,7 +53,7 @@ $perfilAtivo = (int)($_SESSION['id_perfil'] ?? ($perfis[0]['id_perfil'] ?? 1));
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfis - Forçamon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -156,6 +159,38 @@ $perfilAtivo = (int)($_SESSION['id_perfil'] ?? ($perfis[0]['id_perfil'] ?? 1));
       font-family: 'Nunito', sans-serif;
       font-weight: 700;
     }
+    .tabela-wrap { overflow-x: auto; }
+    .tabela-log {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+    }
+    .tabela-log th {
+      background: #12285a;
+      color: #ffcb05;
+      font-family: 'Lilita One', sans-serif;
+      font-size: 1rem;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 3px solid #ffcb05;
+    }
+    .tabela-log td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      color: #e2e8f0;
+    }
+    .badge-res {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-family: 'Lilita One', sans-serif;
+      font-size: .82rem;
+      text-transform: uppercase;
+    }
+    .res-vitoria { background: #15803d; color: #fff; }
+    .res-derrota { background: #991b1b; color: #fff; }
+    .res-fuga    { background: #1d4ed8; color: #fff; }
+    .sem-log { color: #94a3b8; text-align: center; padding: 14px; }
   </style>
 </head>
 <body>
@@ -190,6 +225,44 @@ $perfilAtivo = (int)($_SESSION['id_perfil'] ?? ($perfis[0]['id_perfil'] ?? 1));
         <input type="text" name="novo_treinador" placeholder="Nome do treinador..." maxlength="40" required>
         <button class="btn-acao" type="submit">Criar</button>
       </form>
+    </section>
+
+    <section class="painel">
+      <div class="aba">Log de Batalhas</div>
+      <?php if (empty($historico)): ?>
+        <p class="sem-log">Nenhuma batalha registrada neste perfil ainda.</p>
+      <?php else: ?>
+        <div class="tabela-wrap">
+          <table class="tabela-log">
+            <thead>
+              <tr>
+                <th>Resultado</th>
+                <th>Seu Time</th>
+                <th>Time Oponente</th>
+                <th>Turnos</th>
+                <th>Prêmio</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($historico as $b): ?>
+                <tr>
+                  <td>
+                    <span class="badge-res res-<?= htmlspecialchars($b['resultado']) ?>">
+                      <?= htmlspecialchars($b['resultado']) ?>
+                    </span>
+                  </td>
+                  <td><?= htmlspecialchars($b['time_jogador']) ?></td>
+                  <td><?= htmlspecialchars($b['time_oponente']) ?></td>
+                  <td><?= (int)$b['turnos'] ?></td>
+                  <td>₽ <?= number_format((int)$b['moedas_ganhas'], 0, ',', '.') ?></td>
+                  <td><?= date('d/m/Y H:i', strtotime($b['data_batalha'])) ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      <?php endif; ?>
     </section>
   </main>
 </body>

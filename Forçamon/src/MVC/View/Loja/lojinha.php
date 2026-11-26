@@ -179,9 +179,9 @@
 
   <script>
     const CATEGORIAS = [
-      { id: 'hp',       titulo: 'Volta Vida & Recaídas' },
-      { id: 'status',   titulo: 'Eu Já Superei' },
-      { id: 'reviver',  titulo: 'Eu Vou Mas Volto' },
+      { id: 'hp',       titulo: 'Poções de HP' },
+      { id: 'status',   titulo: 'Poções de Cura' },
+      { id: 'reviver',  titulo: 'Poção de reviver' },
       { id: 'evolucao', titulo: 'Pedra Preciosa' }
     ];
 
