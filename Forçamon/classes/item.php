@@ -10,6 +10,11 @@ class Item
     private int $preco;
     private string $slug;
 
+    /**
+     * Recebe o ID ($id), o nome ($nome), o tipo ($tipo), o valor do efeito ($valorEfeito),
+     * o status que o item cura ($statusCura), o preço ($preco) e o slug ($slug).
+     * Inicializa todas as propriedades do objeto Item com os valores informados.
+     */
     public function __construct(
         int $id,
         string $nome,
@@ -28,6 +33,10 @@ class Item
         $this->slug        = $slug;
     }
 
+    /**
+     * Recebe um array associativo ($dados) com as informações do item.
+     * Cria e retorna uma nova instância da classe Item mapeando as chaves do array ou aplicando valores padrão.
+     */
     public static function criar(array $dados): self
     {
         return new self(
@@ -41,14 +50,52 @@ class Item
         );
     }
 
+    /**
+     * Não recebe parâmetros.
+     * Retorna o ID do item.
+     */
     public function getId(): int { return $this->id; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o nome do item.
+     */
     public function getNome(): string { return $this->nome; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o tipo do item.
+     */
     public function getTipo(): string { return $this->tipo; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o valor numérico do efeito do item ou null caso não possua.
+     */
     public function getValorEfeito(): ?int { return $this->valorEfeito; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o nome do status que o item cura ou null caso não cure status.
+     */
     public function getStatusCura(): ?string { return $this->statusCura; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o preço do item.
+     */
     public function getPreco(): int { return $this->preco; }
+
+    /**
+     * Não recebe parâmetros.
+     * Retorna o slug identificador do item.
+     */
     public function getSlug(): string { return $this->slug; }
 
+    /**
+     * Não recebe parâmetros.
+     * Retorna uma string descrevendo o efeito do item com base no seu tipo, valor de efeito e status de cura.
+     */
     public function descricaoEfeito(): string
     {
         return match ($this->tipo) {
@@ -66,6 +113,10 @@ class Item
         };
     }
 
+    /**
+     * Recebe o nome do método chamado dinamicamente ($metodo) e um array com os argumentos passados ($args).
+     * Intercepta chamadas ao método 'usar', valida se o alvo é um Forcamon, aplica o efeito correspondente (cura de HP, reviver ou genérico) e retorna uma mensagem de resultado; lança exceção se o método não existir ou se o alvo for inválido.
+     */
     public function __call(string $metodo, array $args)
     {
         if ($metodo === 'usar') {
@@ -95,6 +146,10 @@ class Item
         throw new BadMethodCallException("Método {$metodo} não existe.");
     }
 
+    /**
+     * Recebe opcionalmente a quantidade do item na mochila ($qtdMochila, padrão 0).
+     * Converte e retorna os dados do item, incluindo a descrição do efeito e a quantidade na mochila, em um array associativo.
+     */
     public function paraArray(int $qtdMochila = 0): array
     {
         return [

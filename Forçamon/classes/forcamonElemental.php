@@ -1,6 +1,9 @@
 <?php
 class ForcamonFogo extends Forcamon
 {
+    /**
+     * Retorna um array com a lista de golpes específicos do Forcamon do tipo fogo.
+     */
     public function getGolpes(): array
     {
         return [
@@ -13,6 +16,9 @@ class ForcamonFogo extends Forcamon
 
 class ForcamonAgua extends Forcamon
 {
+    /**
+     * Retorna um array com a lista de golpes específicos do Forcamon do tipo água.
+     */
     public function getGolpes(): array
     {
         return [
@@ -25,6 +31,9 @@ class ForcamonAgua extends Forcamon
 
 class ForcamonPsiquico extends Forcamon
 {
+    /**
+     * Retorna um array com a lista de golpes específicos do Forcamon do tipo psíquico.
+     */
     public function getGolpes(): array
     {
         return [
@@ -75,6 +84,9 @@ class ForcamonGenerico extends Forcamon
         ],
     ];
 
+    /**
+     * Retorna o array de golpes correspondente ao tipo do Forcamon ou, caso o tipo não esteja mapeado, retorna os golpes do tipo 'normal'.
+     */
     public function getGolpes(): array
     {
         return self::$golpesPorTipo[$this->tipo] ?? self::$golpesPorTipo['normal'];

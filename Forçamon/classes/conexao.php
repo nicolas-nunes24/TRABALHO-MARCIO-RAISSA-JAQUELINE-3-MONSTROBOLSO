@@ -3,6 +3,9 @@ class Conexao
 {
     private static ?PDO $pdo = null;
 
+    /**
+     * Cria e configura uma única instância de conexão PDO com o banco de dados caso ainda não exista, e retorna essa instância.
+     */
     public static function obter(): PDO
     {
         if (self::$pdo === null) {
