@@ -6,29 +6,48 @@ require_once __DIR__ . "/../../../log/registrar_log.php";
 
 class UsuarioController {
 
+    /**
+     * Inicia a sessão PHP caso ela ainda não esteja ativa.
+     */
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
+    /**
+     * Recebe o nome da view ($view) e opcionalmente um array de dados ($dados, padrão vazio).
+     * Extrai os elementos do array como variáveis locais e inclui o arquivo da view correspondente.
+     */
     private function renderizar($view, $dados = []) {
         extract($dados);
         require_once __DIR__ . "/../View/Usuario/$view.php";
     }
 
+    /**
+     * Renderiza a tela de cadastro de usuário.
+     */
     public function cadastro() {
         $this->renderizar('cadastro');
     }
 
+    /**
+     * Renderiza a tela de login.
+     */
     public function login() {
         $this->renderizar('login');
     }
 
+    /**
+     * Renderiza a tela de recuperação de senha.
+     */
     public function recuperar() {
         $this->renderizar('recuperar');
     }
 
+    /**
+     * Valida a requisição POST e o e-mail informado, verifica se o usuário existe, registra o log da solicitação, define uma mensagem de sucesso na sessão e redireciona para a tela de recuperação (ou redireciona com erro em caso de falha).
+     */
     public function enviarRecuperacao() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             registrarLog('login', "Tentativa de recuperação de senha falhou: requisição inválida.", 'Desconhecido');
@@ -60,6 +79,9 @@ class UsuarioController {
         }
     }
 
+    /**
+     * Verifica se o usuário está autenticado e existe no banco, garante um perfil ativo na sessão, consulta o saldo de moedas do perfil e renderiza a view da loja passando esse saldo.
+     */
     public function dashboard() {
         if (empty($_SESSION['usuario_id'])) {
             header("Location: ?acao=login");
@@ -81,6 +103,9 @@ class UsuarioController {
         $this->renderizar('../Loja/lojinha', ['moeda' => $moedasPerfil]);
     }
 
+    /**
+     * Valida a requisição POST e os campos obrigatórios, cria e salva um novo usuário junto com um perfil inicial de 650 moedas, registra o log, define a mensagem de sucesso e redireciona para o login (ou redireciona com erro em caso de falha).
+     */
     public function registrar() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             registrarLog('registro', "Tentativa de cadastro falhou: requisição inválida.", 'Desconhecido');
@@ -119,6 +144,9 @@ class UsuarioController {
         }
     }
 
+    /**
+     * Valida a requisição POST e as credenciais enviadas, busca o usuário por e-mail ou nome, verifica a senha, regenera a sessão, ativa o perfil do usuário, registra o log e redireciona para o jogo (ou redireciona com erro em caso de falha).
+     */
     public function fazerLogin() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             registrarLog('login', "Tentativa de login falhou: requisição inválida.", 'Desconhecido');
@@ -159,6 +187,10 @@ class UsuarioController {
         }
     }
 
+    /**
+     * Recebe o ID do usuário ($usuarioId) e o nome padrão do treinador ($nomePadrao).
+     * Verifica se o perfil atual da sessão pertence ao usuário; caso não exista ou seja inválido, busca o primeiro perfil cadastrado para o usuário ou cria um novo com 650 moedas, atualizando os dados do perfil na sessão.
+     */
     private function garantirPerfilAtivo(int $usuarioId, string $nomePadrao): void {
         $db = conexao();
         if (!empty($_SESSION['id_perfil'])) {
@@ -186,6 +218,9 @@ class UsuarioController {
         }
     }
 
+    /**
+     * Limpa os dados da sessão, remove o cookie de sessão, destrói a sessão atual e redireciona para a tela de login.
+     */
     public function logout() {
         $_SESSION = [];
         if (ini_get("session.use_cookies")) {
@@ -200,6 +235,10 @@ class UsuarioController {
         exit;
     }
 
+    /**
+     * Recebe a ação de destino ($acao) e a mensagem de erro ($mensagem).
+     * Armazena a mensagem de erro na sessão, redireciona para a ação informada e encerra a execução do script.
+     */
     private function redirecionarComErro($acao, $mensagem) {
         $_SESSION['flash_error'] = $mensagem;
         header("Location: ?acao=$acao");

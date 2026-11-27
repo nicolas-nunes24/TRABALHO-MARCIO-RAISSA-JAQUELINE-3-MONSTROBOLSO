@@ -1,6 +1,10 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
 
+/**
+ * Recebe a categoria do log ($categoria), a mensagem a ser registrada ($mensagem) e opcionalmente o nome do usuário ($usuario, padrão null).
+ * Inicia a sessão caso não esteja ativa, valida a categoria (usando 'geral' se não estiver na lista permitida), identifica o usuário e o IP, formata a linha com data e hora e grava o registro no arquivo de log correspondente.
+ */
 function registrarLog(string $categoria, string $mensagem, ?string $usuario = null): void {
     // Garante que a sessão esteja ativa para tentar pegar o usuário automaticamente
     if (session_status() === PHP_SESSION_NONE) {

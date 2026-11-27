@@ -123,6 +123,9 @@ if (count($meuTime) < 3) {
   </div>
 
   <script>
+  /**
+   * Envia um registro de log (categoria e mensagem) para a API de logs via POST.
+   */
   const enviarLog = (categoria, mensagem) => {
     fetch('log/api_log.php', {
       method: 'POST',
@@ -137,6 +140,10 @@ if (count($meuTime) < 3) {
   const multEstagio = e => e >= 0 ? (2 + e) / 2 : 2 / (2 - e);
 
   const cacheSprites = {};
+
+  /**
+   * Carrega a imagem do sprite em um canvas, remove o fundo claro conectado às bordas (flood fill) e suaviza as bordas antes de exibir no elemento img, armazenando o resultado em cache.
+   */
   function carregarSpriteTransparente(imgEl, url, reserva) {
     if (!url) return;
     if (cacheSprites[url]) {
@@ -247,6 +254,9 @@ if (count($meuTime) < 3) {
 
   const golpeCombate = { nome: "Combate", poder: 50, precisao: 100, tipo: "normal", infinito: true };
 
+  /**
+   * Garante que um objeto Forçamon possua todos os atributos padrão de batalha, estágios de ataque/defesa e contadores de PP dos golpes.
+   */
   const normalizarPoke = p => {
     const golpesBase = p.golpes || [
       { nome: "Investida", poder: 40, precisao: 100, tipo: "normal", pp: 35 }
@@ -275,6 +285,9 @@ if (count($meuTime) < 3) {
     };
   };
 
+  /**
+   * Embaralha uma cópia do catálogo e retorna uma quantidade definida de Forçamons inimigos normalizados.
+   */
   function sortearInimigos(lista, qtd = 3) {
     const copia = JSON.parse(JSON.stringify(lista));
     for (let i = copia.length - 1; i > 0; i--) {
@@ -292,6 +305,9 @@ if (count($meuTime) < 3) {
   let turnos = 0;
   let travado = true;
 
+  /**
+   * Aplica temporariamente uma classe CSS de animação em um elemento pelo ID e a remove após a duração especificada.
+   */
   function animar(idElemento, classeAnim, duracao = 950) {
     const el = $(idElemento);
     if (!el) return;
@@ -301,6 +317,9 @@ if (count($meuTime) < 3) {
     setTimeout(() => el.classList.remove(classeAnim), duracao);
   }
 
+  /**
+   * Atualiza a largura, a cor (verde, amarelo ou vermelho) e o texto numérico da barra de HP.
+   */
   function atualizarBarraHP(idBarra, idTexto, hp, hpMax) {
     const porc = Math.max(0, (hp / hpMax) * 100);
     const barra = $(idBarra);
@@ -309,6 +328,9 @@ if (count($meuTime) < 3) {
     $(idTexto).innerText = `${Math.ceil(hp)}/${hpMax}`;
   }
 
+  /**
+   * Sincroniza os nomes, sprites, barras de HP e botões de ataque da arena com os Forçamons ativos do jogador e do inimigo.
+   */
   function atualizarArena() {
     const bicho = meuTime[vezDoBicho];
     const op = timeInimigo[vezDoInimigo];
@@ -345,6 +367,9 @@ if (count($meuTime) < 3) {
     });
   }
 
+  /**
+   * Calcula o resultado de um golpe considerando precisão, atributos com estágios, STAB, efetividade de tipo, variação aleatória e chance de crítico.
+   */
   function calcularDano(atacante, defensor, golpe) {
     if (Math.random() * 100 > golpe.precisao) return { errou: true };
     if (golpe.poder === 0) return { dano: 0, efec: 1, critico: false };
@@ -364,6 +389,9 @@ if (count($meuTime) < 3) {
     return { dano, efec, critico };
   }
 
+  /**
+   * Executa um golpe descontando PP, disparando animações, aplicando dano ou debuff no defensor, atualizando a barra de HP e narrando a ação.
+   */
   function aplicarGolpe(atacante, defensor, golpe, alvoEhInimigo) {
     if (!golpe.infinito && golpe.ppAtual > 0) {
       golpe.ppAtual--;
@@ -403,6 +431,9 @@ if (count($meuTime) < 3) {
     falar(log);
   }
 
+  /**
+   * Preenche e exibe o modal de fim de batalha com ícone, título, descrição, turnos jogados, recompensa e saldo atualizado.
+   */
   function exibirCardResultado(resultado, dados) {
     const card = $('cardResultado');
     card.className = 'card-resultado ' + resultado;
@@ -432,6 +463,9 @@ if (count($meuTime) < 3) {
     $('modalResultado').classList.add('ativo');
   }
 
+  /**
+   * Registra o resultado da batalha na API do servidor para computar recompensas e exibe o card de resultado.
+   */
   async function encerrarBatalha(resultado) {
     let dados = { recompensa: 0, moedas: 0, treinador: 'Treinador' };
     try {
@@ -454,6 +488,9 @@ if (count($meuTime) < 3) {
     exibirCardResultado(resultado, dados);
   }
 
+  /**
+   * Trava os controles e encerra a batalha com o status de fuga.
+   */
   function fugirBatalha() {
     if (travado) return;
     travado = true;
@@ -461,6 +498,9 @@ if (count($meuTime) < 3) {
     encerrarBatalha('fuga');
   }
 
+  /**
+   * Seleciona aleatoriamente um golpe com PP disponível para o inimigo, ou retorna o golpe "Combate" caso todos tenham acabado.
+   */
   function escolherGolpeBot(op) {
     const disponiveis = op.golpes.filter(g => g.ppAtual > 0);
     return disponiveis.length
@@ -468,6 +508,9 @@ if (count($meuTime) < 3) {
       : golpeCombate;
   }
 
+  /**
+   * Gerencia a ordem de ataque de um turno com base na velocidade dos Forçamons ativos e verifica desmaios após cada golpe.
+   */
   function executarTurno(golpeJogador) {
     const bicho = meuTime[vezDoBicho];
     const op = timeInimigo[vezDoInimigo];
@@ -496,6 +539,9 @@ if (count($meuTime) < 3) {
     }
   }
 
+  /**
+   * Verifica se o Forçamon inimigo desmaiou; se sim, chama o próximo reserva disponível ou encerra a batalha com vitória.
+   */
   function checarDesmaioInimigo(op) {
     if (op.hp > 0) {
       setTimeout(() => {
@@ -518,6 +564,9 @@ if (count($meuTime) < 3) {
     }, 1200);
   }
 
+  /**
+   * Verifica se o Forçamon do jogador desmaiou; se sim, envia o próximo reserva disponível ou encerra a batalha com derrota.
+   */
   function checarDesmaioJogador(bicho) {
     if (bicho.hp > 0) {
       setTimeout(() => {
@@ -540,10 +589,16 @@ if (count($meuTime) < 3) {
     }, 1200);
   }
 
+  /**
+   * Fecha o modal de troca de time ou mochila removendo a classe 'ativo'.
+   */
   function fecharModal() {
     $('modalArena').classList.remove('ativo');
   }
 
+  /**
+   * Atualiza os atributos e a imagem de um Forçamon com os dados da sua forma evoluída.
+   */
   function aplicarForma(bicho, forma) {
     bicho.nome = forma.nome;
     bicho.img = forma.img;
@@ -555,6 +610,9 @@ if (count($meuTime) < 3) {
     bicho.evoluido = true;
   }
 
+  /**
+   * Envia a solicitação de evolução do Forçamon ativo para a API, executa a animação, aplica a nova forma e passa o turno para o ataque do inimigo.
+   */
   async function evoluirAtivo(selecionado) {
     const bicho = meuTime[vezDoBicho];
 
@@ -591,6 +649,9 @@ if (count($meuTime) < 3) {
     }, 3300);
   }
 
+  /**
+   * Abre o modal listando os Forçamons reservas com HP maior que zero disponíveis para troca.
+   */
   function abrirTroca() {
     if (travado) return;
 
@@ -610,6 +671,9 @@ if (count($meuTime) < 3) {
     $('modalArena').classList.add('ativo');
   }
 
+  /**
+   * Realiza a troca para o Forçamon selecionado pelo índice, atualiza a arena e permite o contra-ataque do inimigo.
+   */
   function confirmarTroca(idx) {
     fecharModal();
     if (!meuTime[idx] || idx === vezDoBicho || meuTime[idx].hp <= 0) return;
@@ -627,6 +691,9 @@ if (count($meuTime) < 3) {
     }, 1300);
   }
 
+  /**
+   * Busca os itens do jogador na API e exibe a lista no modal da mochila.
+   */
   async function abrirMochila() {
     if (travado) return;
     try {
@@ -649,6 +716,9 @@ if (count($meuTime) < 3) {
     }
   }
 
+  /**
+   * Consome um item da mochila (evolução, cura de HP, reviver ou cura de status), aplica seu efeito e passa o turno para o inimigo.
+   */
   async function usarItemMochila(selecionado) {
     fecharModal();
     try {
@@ -699,6 +769,9 @@ if (count($meuTime) < 3) {
     }
   }
 
+  /**
+   * Consulta na API as evoluções já desbloqueadas pelo jogador e aplica as formas evoluídas correspondentes ao time atual.
+   */
   async function aplicarEvolucoesSalvas() {
     try {
       const res = await fetch('api_batalha.php?acao=evolucoes');

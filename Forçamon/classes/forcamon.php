@@ -17,8 +17,8 @@ abstract class Forcamon
     protected bool $evoluido;
 
     /**
-     * Recebe um array associativo ($dados) com as informações do Forcamon.
-     * Inicializa todas as propriedades do objeto usando os valores fornecidos ou valores padrão caso algum dado não seja informado.
+     * - Recebe um array associativo ($dados) com as informações do Forcamon.
+     * - Inicializa todas as propriedades do objeto usando os valores fornecidos ou valores padrão caso algum dado não seja informado.
      */
     public function __construct(array $dados)
     {
@@ -39,14 +39,13 @@ abstract class Forcamon
     }
 
     /**
-     * Não recebe parâmetros.
-     * Método abstrato que obriga as classes filhas a retornarem um array com os golpes do Forcamon.
+     * - Método abstrato que obriga as classes filhas a retornarem um array com os golpes do Forcamon.
      */
     abstract public function getGolpes(): array;
 
     /**
-     * Recebe o tipo do golpe sofrido ($tipoGolpe).
-     * Verifica se o tipo está na lista de fraquezas do Forcamon e retorna o multiplicador de dano (2.0 se for fraqueza, 1.0 caso contrário).
+     * - Recebe o tipo do golpe sofrido ($tipoGolpe).
+     * - Verifica se o tipo está na lista de fraquezas do Forcamon e retorna o multiplicador de dano (2.0 se for fraqueza, 1.0 caso contrário).
      */
     public function calcularMultiplicador(string $tipoGolpe): float
     {
@@ -54,61 +53,79 @@ abstract class Forcamon
     }
 
     /**
-     * Não recebe parâmetros.
-     * Retorna o nome do Forcamon.
+     * - Retorna o nome do Forcamon.
      */
     public function getNome(): string { return $this->nome; }
 
     /**
-     * Não recebe parâmetros.
-     * Retorna o tipo do Forcamon.
+     * - Retorna o tipo do Forcamon.
      */
     public function getTipo(): string { return $this->tipo; }
 
     /**
-     * Não recebe parâmetros.
-     * Retorna o valor atual de HP do Forcamon.
+     * - Retorna o valor atual de HP do Forcamon.
      */
     public function getHp(): int { return $this->hp; }
 
     /**
-     * Recebe o novo valor de HP ($hp).
-     * Atualiza o HP do Forcamon garantindo que o valor fique limitado entre 0 e o HP máximo.
+     * - Recebe o novo valor de HP ($hp).
+     * - Atualiza o HP do Forcamon garantindo que o valor fique limitado entre 0 e o HP máximo.
      */
     public function setHp(int $hp): void { $this->hp = max(0, min($this->hpMax, $hp)); }
 
     /**
-     * Não recebe parâmetros.
-     * Retorna a velocidade do Forcamon.
+     * - Retorna a velocidade do Forcamon.
      */
     public function getVelocidade(): int { return $this->velocidade; }
 
-<<<<<<< HEAD
     /**
-     * Não recebe parâmetros.
-     * Converte e retorna todas as propriedades do Forcamon, incluindo seus golpes, em um array associativo.
+     * - Retorna o ID único do Forcamon.
      */
-=======
     public function getId(): int { return $this->id; }
+
+    /**
+     * - Retorna o valor máximo de HP do Forcamon.
+     */
     public function getVidaMaxima(): int { return $this->hpMax; }
+
+    /**
+     * - Verifica se o Forcamon ainda está vivo (HP maior que 0).
+     */
     public function estaVivo(): bool { return $this->hp > 0; }
+
+    /**
+     * - Retorna se o Forcamon já passou pelo processo de evolução.
+     */
     public function jaEvoluiu(): bool { return $this->evoluido; }
 
+    /**
+     * - Verifica se o Forcamon possui dados de evolução definidos e ainda não evoluiu.
+     */
     public function podeEvoluir(): bool
     {
         return $this->evolucao !== null && !$this->evoluido;
     }
 
+    /**
+     * - Recebe a quantidade de HP a ser recuperada ($quantidade).
+     * - Soma o valor ao HP atual usando setHp() para respeitar o limite máximo de vida.
+     */
     public function curar(int $quantidade): void
     {
         $this->setHp($this->hp + $quantidade);
     }
 
+    /**
+     * - Remove qualquer efeito negativo, restaurando o status do Forcamon para 'Saudavel'.
+     */
     public function curarStatus(): void
     {
         $this->status = 'Saudavel';
     }
 
+    /**
+     * - Valida se o Forcamon pode evoluir (lançando EvolucaoInvalidaException caso contrário), aplica o novo nome, imagem, bônus de atributos, restaura o HP ao máximo e marca como evoluído.
+     */
     public function evoluir(): void
     {
         if ($this->evolucao === null) {
@@ -129,7 +146,9 @@ abstract class Forcamon
         $this->evoluido = true;
     }
 
->>>>>>> 13e3c02a66f83b4eeafc22cfc3b410a5341c1a10
+    /**
+     * - Converte todas as propriedades e golpes do Forcamon em um array associativo para serialização (como respostas JSON ou sessão).
+     */
     public function paraArray(): array
     {
         return [

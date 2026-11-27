@@ -11,7 +11,7 @@
   <title>Lojinha - Forçamon</title>
   <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Nunito', sans-serif;
       font-weight: 700;
@@ -189,16 +189,28 @@
     let itens = [];
     let timerAviso;
 
+    /**
+     * Recebe um texto (t).
+     * Escapa caracteres especiais HTML usando um elemento temporário e retorna a string segura para inserção no DOM.
+     */
     function esc(t) {
       const d = document.createElement('div');
       d.textContent = t;
       return d.innerHTML;
     }
 
+    /**
+     * Recebe um valor numérico (v).
+     * Formata o número no padrão brasileiro precedido pelo símbolo '₽ ' e retorna a string formatada.
+     */
     function dinheiro(v) {
       return '₽ ' + Number(v).toLocaleString('pt-BR');
     }
 
+    /**
+     * Recebe o texto da mensagem (texto) e opcionalmente um booleano indicando erro (erro, padrão false).
+     * Exibe o banner de aviso na tela com estilo normal ou de erro e agenda seu ocultamento após 2,6 segundos.
+     */
     function aviso(texto, erro = false) {
       const el = document.getElementById('aviso');
       el.textContent = texto;
@@ -207,6 +219,10 @@
       timerAviso = setTimeout(() => el.className = '', 2600);
     }
 
+    /**
+     * Recebe um objeto de item (item).
+     * Consulta a PokéAPI pelo slug do item para obter a URL do sprite e a salva em item.sprite, usando uma URL de reserva caso a requisição falhe.
+     */
     async function buscarSprite(item) {
       const reserva = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.slug}.png`;
       try {
@@ -218,6 +234,9 @@
       }
     }
 
+    /**
+     * Atualiza o saldo exibido no topo e renderiza no elemento principal os painéis de categorias com os cartões de itens, preços, quantidades na mochila e botões de compra.
+     */
     function desenhar() {
       document.getElementById('saldo').textContent = dinheiro(moeda);
 
@@ -245,6 +264,9 @@
       document.getElementById('conteudo').innerHTML = html;
     }
 
+    /**
+     * Busca o saldo e a lista de itens da loja na API, carrega os sprites de todos os itens em paralelo e chama desenhar() para renderizar a página (ou exibe mensagem de erro em caso de falha).
+     */
     async function carregar() {
       try {
         const resp = await fetch('<?= $base ?>/api_loja.php?acao=listar');
@@ -262,6 +284,10 @@
       }
     }
 
+    /**
+     * Recebe o ID do item (id).
+     * Verifica se há saldo suficiente, envia uma requisição POST para efetuar a compra de 1 unidade na API, atualiza o saldo e a quantidade do item na tela e exibe um aviso com o resultado.
+     */
     async function comprar(id) {
       const item = itens.find(i => i.id === id);
       if (item && moeda < item.preco) {

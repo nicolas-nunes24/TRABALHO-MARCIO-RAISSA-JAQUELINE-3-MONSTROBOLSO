@@ -10,6 +10,10 @@ class Usuario {
     private $senha;
     private $moedas;
 
+    /**
+     * Recebe opcionalmente o nome ($nome), o e-mail ($email) e a senha ($senha).
+     * Caso os três parâmetros sejam informados, valida e define os dados do usuário usando os setters e inicializa o saldo de moedas como 0.
+     */
     public function __construct(string $nome = null, string $email = null, string $senha = null) {
         if ($nome !== null && $email !== null && $senha !== null) {
             $this->setNome($nome);
@@ -19,6 +23,10 @@ class Usuario {
         }
     }
 
+    /**
+     * Recebe o valor a ser buscado ($valor) e o nome da coluna ($coluna).
+     * Valida se a coluna é permitida, consulta o primeiro usuário correspondente no banco de dados e retorna uma instância de Usuario preenchida (ou null se não encontrar, ou false se a coluna for inválida).
+     */
     public static function getByColumn($valor, $coluna) {
         $db = conexao();
         $colunasPermitidas = ['id_usuario', 'nome', 'email'];
@@ -43,14 +51,35 @@ class Usuario {
         return $usuario;
     }
 
-
+    /**
+     * Retorna o ID do usuário.
+     */
     public function getId() { return $this->id; }
+
+    /**
+     * Retorna o nome do usuário.
+     */
     public function getNome() { return $this->nome; }
+
+    /**
+     * Retorna o e-mail do usuário.
+     */
     public function getEmail() { return $this->email; }
+
+    /**
+     * Retorna o hash da senha do usuário.
+     */
     public function getSenha() { return $this->senha; }
+
+    /**
+     * Retorna a quantidade de moedas do usuário.
+     */
     public function getMoedas() { return $this->moedas; }
 
- 
+    /**
+     * Recebe o nome do usuário ($nome).
+     * Remove espaços extras, valida se o tamanho está entre 3 e 20 caracteres e se o nome já não está em uso por outro usuário (lançando exceção em caso de erro) antes de atribuí-lo.
+     */
     public function setNome($nome) {
         $nome = trim($nome);
         if (mb_strlen($nome) < 3 || mb_strlen($nome) > 20) {
@@ -65,6 +94,10 @@ class Usuario {
         $this->nome = $nome;
     }
 
+    /**
+     * Recebe o e-mail do usuário ($email).
+     * Normaliza para minúsculas sem espaços, valida o formato do e-mail e verifica se já não está cadastrado por outro usuário (lançando exceção em caso de erro) antes de atribuí-lo.
+     */
     public function setEmail($email) {
         $email = strtolower(trim($email));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -79,6 +112,10 @@ class Usuario {
         $this->email = $email;
     }
 
+    /**
+     * Recebe a senha em texto puro ($senha).
+     * Valida se possui pelo menos 6 caracteres (lançando exceção caso contrário) e armazena o hash criptografado da senha.
+     */
     public function setSenha($senha) {
         if (strlen($senha) < 6) {
             throw new Exception("A senha deve ter pelo menos 6 caracteres.");
@@ -86,10 +123,17 @@ class Usuario {
         $this->senha = password_hash($senha, PASSWORD_DEFAULT);
     }
 
+    /**
+     * Recebe a quantidade de moedas ($moedas).
+     * Converte o valor para inteiro e define o saldo de moedas do usuário.
+     */
     public function setMoedas($moedas) {
         $this->moedas = (int) $moedas;
     }
 
+    /**
+     * Atualiza o registro do usuário no banco caso já possua ID, ou insere um novo registro definindo o ID gerado, retornando um booleano indicando o sucesso da operação.
+     */
     public function salvar() {
         $db = conexao();
 
@@ -121,6 +165,9 @@ class Usuario {
         return $ok;
     }
 
+    /**
+     * Remove o usuário do banco de dados caso possua ID e retorna um booleano indicando se a exclusão foi realizada.
+     */
     public function delete() {
         if (!$this->id) return false;
         $db = conexao();

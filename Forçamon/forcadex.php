@@ -6,7 +6,7 @@
   <title>Forçadex - Forçamon</title>
   <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Nunito', sans-serif;
@@ -452,6 +452,9 @@
       });
     });
 
+    /**
+     * Filtra os cards de Forçamons conforme o termo digitado na busca e o filtro selecionado (tipo ou favoritos), atualizando a exibição dos cards, o contador e a mensagem de lista vazia.
+     */
     function applyFilters() {
       const query = searchInput.value.toLowerCase().trim();
 
@@ -492,6 +495,10 @@
       });
     });
 
+    /**
+     * Recebe o índice do card (index).
+     * Ajusta o índice de forma cíclica dentro dos cards visíveis, carrega a imagem correspondente no modal e reseta o zoom.
+     */
     function loadCard(index) {
       if (visibleCards.length === 0) return;
 
@@ -505,10 +512,16 @@
       resetZoom();
     }
 
+    /**
+     * Aplica a transformação CSS de translação e escala (zoom) na imagem do modal com base nas coordenadas e no fator de escala atuais.
+     */
     function updateTransform() {
       modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     }
 
+    /**
+     * Atualiza o estilo do cursor sobre a imagem do modal para indicar zoom ou arrasto conforme a escala e o estado de clique.
+     */
     function updateCursor() {
       if (scale > 1) {
         modalImg.style.cursor = isDragging ? 'grabbing' : 'grab';
@@ -584,6 +597,9 @@
       if (e.key === 'ArrowRight') loadCard(currentIndex + 1);
     });
 
+    /**
+     * Restaura a escala, a posição de translação e o estado de arrasto da imagem do modal para os valores iniciais e atualiza o visual.
+     */
     function resetZoom() {
       scale = 1;
       translateX = 0;
@@ -593,6 +609,9 @@
       updateCursor();
     }
 
+    /**
+     * Fecha o modal de visualização da imagem removendo a classe 'active' e reseta o zoom.
+     */
     function closeModal() {
       modal.classList.remove('active');
       resetZoom();

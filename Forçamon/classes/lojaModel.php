@@ -13,7 +13,6 @@ class LojaModel
     }
 
     /**
-     * Não recebe parâmetros.
      * Consulta todos os itens da loja na view vw_loja_itens, converte cada registro em um objeto Item e retorna o array resultante.
      */
     public function listarItens(): array
@@ -48,9 +47,9 @@ class LojaModel
      * Recebe o ID do perfil ($idPerfil), o ID do item ($idItem) e opcionalmente a quantidade desejada ($quantidade, padrão 1).
      * Valida a quantidade, executa uma transação verificando a existência do item e o saldo disponível, desconta as moedas, adiciona o item à mochila, registra o log da compra e retorna um array com o nome do item, o saldo restante e a quantidade atual do item na mochila.
      */
-    public function comprar(int $idPerfil, int $idItem, int $quantidade = 20): array
+    public function comprar(int $idPerfil, int $idItem, int $quantidade = 1): array
     {
-        if ($quantidade < 20) {
+        if ($quantidade < 1) {
             throw new InvalidArgumentException('Quantidade inválida.');
         }
 

@@ -6,6 +6,10 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/classes/autoload.php';
 
+/**
+ * Recebe um array de dados ($dados) e opcionalmente o código de status HTTP ($status, padrão 200).
+ * Define o código de resposta HTTP, envia os dados codificados em JSON (sem escapar Unicode) e encerra a execução do script.
+ */
 function responder(array $dados, int $status = 200): void
 {
     http_response_code($status);

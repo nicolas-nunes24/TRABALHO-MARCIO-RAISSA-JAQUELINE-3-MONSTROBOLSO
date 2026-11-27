@@ -1,16 +1,17 @@
 <?php
+  // Carrega o utilitário de logs, o autoload das classes do jogo e inicia a sessão
   require_once __DIR__ . "/log/registrar_log.php";
   require_once __DIR__ . "/classes/autoload.php";
   session_start();
 
-  // forçamons que só aparecem evoluindo outro (não entram no time)
+  // Obtém a lista de Forçamons exclusivos de evolução e define função para filtrá-los do time
   $soPorEvolucao = CatalogoForcamon::nomesSoPorEvolucao();
   $semBloqueados = fn(array $time) => array_values(array_filter(
       $time,
       fn($p) => !in_array($p['nome'] ?? '', $soPorEvolucao, true)
   ));
   
-  // salva o time escolhido e manda pra batalha
+  // Processa o envio do formulário: valida se há 3 Forçamons válidos, salva na sessão, registra log e redireciona para a arena
   if (isset($_POST['time_selecionado'])) {
       $time = $semBloqueados(json_decode($_POST['time_selecionado'], true) ?: []);
       if (count($time) !== 3) {
@@ -24,6 +25,7 @@
       exit;
   }
 
+  // Recupera o time salvo anteriormente na sessão (sem Forçamons bloqueados) para pré-preencher os slots
   $meuTimeSalvo = $semBloqueados($_SESSION['meu_time'] ?? []);
 ?>
 <!DOCTYPE html>
@@ -34,7 +36,7 @@
   <title>Time - Forçamon</title>
   <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Nunito', sans-serif;
@@ -47,7 +49,7 @@
       background-position: center;
       background-attachment: fixed;
     }
-    /* topo */
+    /* Cabeçalho superior */
     .topo {
       background: #12285a;
       border-bottom: 4px solid #ffcb05;
@@ -86,7 +88,7 @@
 
     main { max-width: 1100px; margin: 0 auto; padding: 56px 24px 60px; }
 
-    /* painéis com a abinha do título */
+    /* Painéis principais com aba de título e contador */
     .painel {
       position: relative;
       background: rgba(8, 16, 42, 0.78);
@@ -124,7 +126,7 @@
     }
     .contador.cheio { color: #7CFC7C; border-color: #7CFC7C; }
 
-    /* slots */
+    /* Slots do time escolhido */
     .slots { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; }
     .slot {
       position: relative;
@@ -171,7 +173,7 @@
       font-size: 1rem;
     }
 
-    /* pokébola apagada dos slots vazios */
+    /* Ícone de pokébola apagada exibido nos slots vazios */
     .bolinha {
       position: relative;
       width: 50px;
@@ -201,7 +203,7 @@
     .botao.travado { filter: grayscale(.8) brightness(.75); }
     .aviso { min-height: 20px; color: #ffb4b0; }
 
-    /* forçamons */
+    /* Grade de cards dos Forçamons disponíveis */
     .grade-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 18px; }
     .card {
       background: #eef1f6;
@@ -225,6 +227,7 @@
     }
     .card .nome { font-family: 'Lilita One', sans-serif; font-size: 1.05rem; }
 
+    /* Badges de cores por tipo elemental */
     .tipo { font-family: 'Lilita One', sans-serif; font-size: .78rem; padding: 2px 9px; border-radius: 999px; border: 2px solid rgba(255,255,255,.85); }
     .t-fogo { background: #e8590c; }
     .t-planta { background: #3a9d23; }
@@ -235,11 +238,12 @@
     .t-dragao { background: #5b3fd1; }
     .t-aco { background: #5c7a94; }
 
+    /* Estilo para Forçamons bloqueados (somente por evolução) */
     .card.bloqueado { cursor: not-allowed; opacity: .55; filter: grayscale(.7); }
     .card.bloqueado:hover { border-color: #fff; }
     .evo-nota { padding: 4px 10px; font-size: .75rem; line-height: 1.25; text-align: center; color: #12285a; background: #ffcb05; }
 
-    /* já escolhido */
+    /* Estilo para cards que já foram colocados em algum slot */
     .card.sumido { opacity: .3; filter: grayscale(1); pointer-events: none; }
 
     @media (max-width: 760px) {
@@ -253,6 +257,7 @@
 </head>
 <body>
 
+  <!-- Cabeçalho com logo e botão de retorno ao menu -->
   <header class="topo">
     <a class="logo" href="site_jogo.php"><span>FORÇAM</span><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#3563b8"/><circle cx="24" cy="24" r="17" fill="#fff" stroke="#1a2a55" stroke-width="3"/><path d="M7 24a17 17 0 0 1 34 0z" fill="#e8312f" stroke="#1a2a55" stroke-width="3" stroke-linejoin="round"/><line x1="7" y1="24" x2="41" y2="24" stroke="#1a2a55" stroke-width="3.5"/><circle cx="24" cy="24" r="6" fill="#fff" stroke="#1a2a55" stroke-width="3"/></svg><span>N</span></a>
     <div class="topo-btns">
@@ -261,6 +266,7 @@
   </header>
 
   <main>
+    <!-- Painel superior: slots do time selecionado e envio para batalha -->
     <section class="painel">
       <div class="aba">Seu time</div>
       <div class="contador" id="contador">0/3</div>
@@ -278,6 +284,7 @@
       </form>
     </section>
 
+    <!-- Painel inferior: catálogo de Forçamons para arrastar ou clicar -->
     <section class="painel">
       <div class="aba">Forçamons</div>
 
@@ -299,7 +306,9 @@
     let cardSendoArrastado = "";
     let timeVelho = <?php echo json_encode($meuTimeSalvo); ?>;
 
-    // recoloca o time salvo nos slots
+    /**
+     * Ao carregar a página, restaura nos slots o time salvo anteriormente na sessão e atualiza o contador.
+     */
     window.onload = function() {
       if (timeVelho && timeVelho.length > 0) {
         timeVelho.forEach((bicho, i) => {
@@ -311,20 +320,32 @@
       atualizarContador();
     };
 
+    /**
+     * Armazena o ID do card no início da ação de arrastar (drag-and-drop).
+     */
     function pegarCard(e) {
       cardSendoArrastado = e.currentTarget.id;
       e.dataTransfer.setData("text/plain", cardSendoArrastado);
     }
 
+    /**
+     * Permite soltar um elemento sobre o slot e aplica a classe visual de destaque.
+     */
     function segurar(e) {
       e.preventDefault();
       e.currentTarget.classList.add('destaque');
     }
 
+    /**
+     * Remove o destaque visual quando o card arrastado sai da área do slot.
+     */
     function tirarDestaque(e) {
       e.currentTarget.classList.remove('destaque');
     }
 
+    /**
+     * Finaliza o drop inserindo o card arrastado no slot alvo (substituindo o anterior, caso já esteja preenchido).
+     */
     function soltar(e) {
       e.preventDefault();
       let slot = e.currentTarget;
@@ -336,6 +357,9 @@
       }
     }
 
+    /**
+     * Adiciona o Forçamon clicado ao primeiro slot vazio disponível ou exibe um aviso caso o time já esteja completo.
+     */
     function clicarCard(cardEl) {
       let slots = document.querySelectorAll('.slot');
       for (let s of slots) {
@@ -347,6 +371,9 @@
       document.getElementById('aviso').textContent = "Time cheio. Clique num slot pra tirar um monstro.";
     }
 
+    /**
+     * Preenche um slot com a imagem e os dados do Forçamon escolhido, marca o card original como já utilizado e atualiza o contador.
+     */
     function colocarNoSlot(slot, cardId) {
       let cardEl = document.getElementById(cardId);
       if (!cardEl || cardEl.classList.contains('bloqueado')) return;
@@ -360,6 +387,9 @@
       atualizarContador();
     }
 
+    /**
+     * Esvazia o slot clicado, reabilita o card correspondente na grade de Forçamons e atualiza o contador.
+     */
     function limparSlot(slot) {
       if (slot.classList.contains('preenchido')) {
         let cardId = slot.getAttribute('data-card-id');
@@ -378,6 +408,9 @@
       }
     }
 
+    /**
+     * Atualiza o contador de vagas preenchidas (0/3), libera ou trava o botão de batalha e limpa avisos quando o time é completado.
+     */
     function atualizarContador() {
       let qtd = document.querySelectorAll('.slot.preenchido').length;
       let contador = document.getElementById('contador');
@@ -387,6 +420,9 @@
       if (qtd === 3) document.getElementById('aviso').textContent = "";
     }
 
+    /**
+     * Valida se existem 3 Forçamons nos slots, serializa o time em JSON no campo oculto e envia o formulário.
+     */
     function enviarTime() {
       let preenchidos = document.querySelectorAll('.slot.preenchido');
       if (preenchidos.length < 3) {
