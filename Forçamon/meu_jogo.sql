@@ -118,4 +118,16 @@ ORDER BY FIELD(tipoItem, 'hp', 'status', 'reviver', 'evolucao'), valorItem;
 
 -- View que retorna apenas os itens com quantidade maior que zero na mochila de cada perfil, já com os detalhes da loja
 CREATE VIEW vw_mochila_usuario AS
-SELECT m.id_perfil, m.id_item
+SELECT 
+    m.id_perfil, 
+    m.id_item, 
+    l.nomeItem, 
+    l.tipoItem, 
+    l.valorEfeito, 
+    l.statusCura, 
+    l.valorItem, 
+    l.slugApi, 
+    m.quantidade
+FROM Mochila m
+JOIN Loja l ON m.id_item = l.id_item
+WHERE m.quantidade > 0;
